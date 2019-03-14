@@ -75,4 +75,12 @@ public class MathV{
 
         return out;
     }
+
+    public static double sigm(double x){
+        return 1 / (1 + Math.exp(-x));
+    }
+
+    public static double disgm(double x){
+        return sigm(x) * ( 1 - sigm(x));
+    }
 }

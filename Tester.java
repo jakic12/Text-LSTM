@@ -6,39 +6,51 @@ public class Tester{
 
             Tester mathT = new Tester("MathV");
 
-            mathT.assertEqual(
-                MathV.add(new double[]{1d,3d}, new double[]{3d,2d}),
-                new double[]{4d, 5d},
-                "vector addition"
-            );
-            mathT.assertEqual(
-                MathV.sub(new double[]{6d,10d}, new double[]{3d,2d}),
-                new double[]{3d, 8d}, 
-                "vector substractiob"
-            );
-            mathT.assertEqual(
-                MathV.multiply(new double[]{1d,3d}, new double[]{3d,2d}),
-                new double[]{3d, 6d}, 
-                "vector multiplication"
-            );
-            mathT.assertEqual(
-                MathV.div(new double[]{6d,10d}, new double[]{3d,2d}),
-                new double[]{2d, 5d}, 
-                "vector division"
-            );
+                mathT.assertEqual(
+                    MathV.add(new double[]{1d,3d}, new double[]{3d,2d}),
+                    new double[]{4d, 5d},
+                    "vector addition"
+                );
+                mathT.assertEqual(
+                    MathV.sub(new double[]{6d,10d}, new double[]{3d,2d}),
+                    new double[]{3d, 8d}, 
+                    "vector substractiob"
+                );
+                mathT.assertEqual(
+                    MathV.multiply(new double[]{1d,3d}, new double[]{3d,2d}),
+                    new double[]{3d, 6d}, 
+                    "vector multiplication"
+                );
+                mathT.assertEqual(
+                    MathV.div(new double[]{6d,10d}, new double[]{3d,2d}),
+                    new double[]{2d, 5d}, 
+                    "vector division"
+                );
 
-            mathT.assertEqual(
-                MathV.dot(new double[][]{{1,2,3},{1,2,3}}, new double[][]{{1,2,3,1,3,3},{3,1,3,2,2,2},{3,2,3,2,1,4}}),
-                new double[][]{{16,10,18,11,10,19},{16,10,18,11,10,19}},
-                "matrix by matrix multiplication"
-            );
+                mathT.assertEqual(
+                    MathV.dot(new double[][]{{1,2,3},{1,2,3}}, new double[][]{{1,2,3,1,3,3},{3,1,3,2,2,2},{3,2,3,2,1,4}}),
+                    new double[][]{{16,10,18,11,10,19},{16,10,18,11,10,19}},
+                    "matrix by matrix multiplication"
+                );
 
-            mathT.assertEqual(
-                MathV.dot(new double[]{1,2,3},
-                new double[][]{{1,2,3,1,3,3},{3,1,3,2,2,2},{3,2,3,2,1,4}}),
-                new double[]{16,10,18,11,10,19},
-                "vector by matrix multiplication");
+                mathT.assertEqual(
+                    MathV.dot(new double[]{1,2,3},
+                    new double[][]{{1,2,3,1,3,3},{3,1,3,2,2,2},{3,2,3,2,1,4}}),
+                    new double[]{16,10,18,11,10,19},
+                    "vector by matrix multiplication"
+                );
 
+                mathT.assertEqual(
+                    MathV.sigm(0d),
+                    0.5d,
+                    "sigmoid function"
+                );
+
+                mathT.assertEqual(
+                    MathV.disgm(0d),
+                    0.25d, 
+                    "sigmoid function"
+                );
 
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
@@ -66,6 +78,10 @@ public class Tester{
 
         testResults = new ArrayList<Boolean>();
         testNames = new ArrayList<String>();
+    }
+
+    public void assertEqual(double a, double b, String testName){
+        assertTrue(a == b, testName);
     }
 
     public void assertEqual(double[] a, double[] b, String testName){
