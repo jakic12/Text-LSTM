@@ -80,12 +80,19 @@ public class MathV{
         return 1 / (1 + Math.exp(-x));
     }
 
+    public static double[] sigmArray(double[] x){
+        for(int i = 0; i < x.length; i++){
+            x[i] = sigm(x[i]);
+        }
+        return x;
+    }
+
     public static double disgm(double x){
         return sigm(x) * ( 1 - sigm(x));
     }
 
     public static double[] randomArray(int size){
-        return radnomArray(size, 0, 1);
+        return randomArray(size, 0d, 1d);
     }
 
     public static double[] randomArray(int size, double min, double max) {
@@ -103,7 +110,7 @@ public class MathV{
     }
 
     public static double[][] randomArray(int sizeX, int sizeY, double min, double max) {
-        double[][] out = new double[sizeX][sizeY];
+        double[][] out = new double[sizeY][sizeX];
 
         for(int i = 0; i < out.length; i++){
             for(int j = 0; j < out[i].length; j++){

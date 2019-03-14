@@ -49,8 +49,22 @@ public class Tester{
                 mathT.assertEqual(
                     MathV.disgm(0d),
                     0.25d, 
-                    "sigmoid function"
+                    "derivated sigmoid function"
                 );
+
+                mathT.assertEqual(
+                    MathV.sigmArray(new double[]{0d,0d,0d}),
+                    new double[]{0.5d, 0.5d, 0.5d},
+                    "sigmoid array function"
+                );
+
+                mathT.assertEqual(
+                    MathV.randomArray(2,3,0,0),
+                    new double[][]{{0,0},{0,0},{0,0}},
+                    "random array dimensions"
+                );
+
+
 
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
@@ -69,13 +83,24 @@ public class Tester{
                 );
 
                 cnnT.assertTrue( 
-                    testCnn.synapses[0].length == 2 &&
+                    testCnn.synapses[0].length == 3 &&
                     testCnn.synapses[1].length == 2 &&  
-                    testCnn.synapses[2].length == 3 && 
-                    testCnn.synapses[0][0].length == 3 &&
+                    testCnn.synapses[2].length == 2 && 
+                    testCnn.synapses[0][0].length == 2 &&
                     testCnn.synapses[1][0].length == 2 &&  
-                    testCnn.synapses[2][0].length == 2
+                    testCnn.synapses[2][0].length == 3
                     , "synapse dimensions"
+                );
+
+                testCnn.settings[1] = 1;
+                testCnn.settings[2] = 1;
+                testCnn.settings[3] = 0;
+                testCnn.randomlySetWeights();
+
+                cnnT.assertEqual(
+                    testCnn.synapses[0],
+                    new double[][]{{1,1},{1,1},{1,1}},
+                    "weights initialized properly according to settings"
                 );
 
             cnnT.printResult();
