@@ -83,4 +83,35 @@ public class MathV{
     public static double disgm(double x){
         return sigm(x) * ( 1 - sigm(x));
     }
+
+    public static double[] randomArray(int size){
+        return radnomArray(size, 0, 1);
+    }
+
+    public static double[] randomArray(int size, double min, double max) {
+        double[] out = new double[size];
+
+        for(int i = 0; i < size; i++){
+            out[i] = Math.random()*(max-min) + min;
+        }
+
+        return out;
+    }
+
+    public static double[][] randomArray(int sizeX, int sizeY) {
+        return randomArray(sizeX, sizeY, 0, 1);
+    }
+
+    public static double[][] randomArray(int sizeX, int sizeY, double min, double max) {
+        double[][] out = new double[sizeX][sizeY];
+
+        for(int i = 0; i < out.length; i++){
+            for(int j = 0; j < out[i].length; j++){
+                out[i][j] = Math.random()*(max-min) + min;
+            }
+        }
+
+        return out;
+    }
+
 }

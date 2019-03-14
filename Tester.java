@@ -55,6 +55,32 @@ public class Tester{
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
 
+            Tester cnnT = new Tester("Cnn");
+                
+                //create testing Cnn object
+                Cnn testCnn = new Cnn(new int[]{3,2,2,3});
+
+                cnnT.assertTrue( 
+                    testCnn.neurons[0].length == 3 &&
+                    testCnn.neurons[1].length == 2 &&  
+                    testCnn.neurons[2].length == 2 && 
+                    testCnn.neurons[3].length == 3
+                    , "neuron dimensions"
+                );
+
+                cnnT.assertTrue( 
+                    testCnn.synapses[0].length == 2 &&
+                    testCnn.synapses[1].length == 2 &&  
+                    testCnn.synapses[2].length == 3 && 
+                    testCnn.synapses[0][0].length == 3 &&
+                    testCnn.synapses[1][0].length == 2 &&  
+                    testCnn.synapses[2][0].length == 2
+                    , "synapse dimensions"
+                );
+
+            cnnT.printResult();
+            mainT.assertTrue(cnnT.result(), "Cnn tests");
+
         mainT.printResult();
     }
 
