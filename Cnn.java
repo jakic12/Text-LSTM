@@ -11,13 +11,15 @@ public class Cnn{
         0, // minimum random bias activation      4
         1, // maximum random bias activation      5
 
-        1 // activation function 1 = sigmoid, 2 = tanh 6
+        1, // activation function 1 = sigmoid     6
+        1  // error function 1 = quadratic        7
     };
 
     double[][] neurons; 
     double[][] biases;
     double[][][] synapses;
     int[] dimensions;
+    double error;
 
     public Cnn(int[] dimensions){
         this.dimensions = dimensions;
@@ -50,12 +52,12 @@ public class Cnn{
             if (i != 0)
                 this.biases[i] = (this.settings[3] == 1)
                         ? MathV.randomArray(this.dimensions[i], this.settings[4], this.settings[5])
-                        : MathV.randomArray(this.dimensions[i]);
+                        : new double[this.dimensions[i]];
 
             if (i < this.dimensions.length - 1) {
                 synapses[i] = (this.settings[0] == 1)
                         ? MathV.randomArray(this.dimensions[i + 1], this.dimensions[i], this.settings[1], this.settings[2])
-                        : MathV.randomArray(this.dimensions[i + 1], this.dimensions[i]);
+                        : new double[this.dimensions[i]][this.dimensions[i + 1]];
             }
         }
     }
@@ -74,5 +76,36 @@ public class Cnn{
                     neurons[i] = MathV.sigmArray(neurons[i]);
             }
         }
+    }
+
+    public void forward(double[] input, double[] expOut){
+        if(neurons[neurons.length-1].length != expOut.length){
+            throw new RuntimeException("expected output and last layer of the network are not the same size");
+        }else{
+            forward(input);
+            if(this.settings[7] == 1){
+                this.error = MathV.sum(MathV.pow(MathV.sub(neurons[neurons.length - 1], expOut), 2));
+            }
+        }
+    }
+
+    public double[] eval(double[] input){
+        forward(input);
+        return this.neurons[this.neurons.length - 1];
+    }
+
+    public static double[] softmax(double[] input){
+        double[] out = input.clone();
+
+        for(int i = 0; i < input.length; i++){
+            out[i] = Math.exp(out[i]);
+        }
+
+        double sumExp = MathV.sum(out);
+
+        for(int i = 0; i < input.length; i++){
+            out[i] = out[i] / sumExp;
+        }
+        return out;
     }
 }

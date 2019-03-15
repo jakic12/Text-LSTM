@@ -14,7 +14,7 @@ public class Tester{
                 mathT.assertEqual(
                     MathV.sub(new double[]{6d,10d}, new double[]{3d,2d}),
                     new double[]{3d, 8d}, 
-                    "vector substractiob"
+                    "vector substraction"
                 );
                 mathT.assertEqual(
                     MathV.multiply(new double[]{1d,3d}, new double[]{3d,2d}),
@@ -64,7 +64,34 @@ public class Tester{
                     "random array dimensions"
                 );
 
+                mathT.assertEqual(
+                    MathV.sum(new double[]{10,20,2}),
+                    32,
+                    "sum of 1D array"
+                );
 
+                mathT.assertEqual(
+                    MathV.sum(new double[][]{{1,2,3},{4,21,2}}),
+                    33,
+                    "sum of 2D array"
+                );
+
+                mathT.assertEqual(
+                    MathV.round(1000d,17),
+                    1000d,
+                    "rounding"
+                );
+
+                mathT.assertEqual(
+                    MathV.round(new double[]{1000,1000},17),
+                    new double[]{1000,1000},
+                    "rounding an array"
+                );
+                mathT.assertEqual(
+                    MathV.pow(new double[]{3,4},3),
+                    new double[]{27,64},
+                    "elementwise exponentiations"
+                );
 
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
@@ -103,6 +130,20 @@ public class Tester{
                     "weights initialized properly according to settings"
                 );
 
+                testCnn.forward(new double[]{1,0,1});
+                cnnT.assertEqual(
+                    (int)(testCnn.neurons[3][1]*1000000)/1000000d,
+                    0.846423,
+                    "forward propagation"
+                );
+
+                cnnT.assertTrue(
+                    MathV.round(MathV.sum(Cnn.softmax(MathV.randomArray(3))),10) == 1,
+                    "softmax function"
+                );
+
+                testCnn.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
+
             cnnT.printResult();
             mainT.assertTrue(cnnT.result(), "Cnn tests");
 
@@ -112,6 +153,7 @@ public class Tester{
     int testCount;
     int testSuccess;
     String name;
+    String debugString;
 
     ArrayList<Boolean> testResults;
     ArrayList<String> testNames;
@@ -132,10 +174,12 @@ public class Tester{
     }
 
     public void assertEqual(double a, double b, String testName){
+        this.debugString = a + "";
         assertTrue(a == b, testName);
     }
 
     public void assertEqual(double[] a, double[] b, String testName){
+        this.debugString = Arrays.toString(a);
         boolean pass = true;
         if(a.length == b.length){
             for(int i = 0; i < a.length; i++){
@@ -197,7 +241,7 @@ public class Tester{
             if(testResults.get(i)){
                 System.out.println("    " + testNames.get(i) + " ✔️");
             }else{
-                System.out.println("    " + testNames.get(i) + " ❌");
+                System.out.println("    " + testNames.get(i) + " ❌" + ((this.debugString != null)? "  " + this.debugString : ""));
             }
         }
     }

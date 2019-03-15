@@ -41,7 +41,7 @@ public class MathV{
 
     public static double[][] dot(double[][] a, double[][] b){
         double[][] out;
-        if(a.length == b[0].length){
+        if(a[0].length != b.length){
             throw new RuntimeException("vector and matrix dimension mismatch");
         }else{
             out = new double[a.length][b[0].length];
@@ -62,7 +62,7 @@ public class MathV{
 
     public static double[] dot(double[] a, double[][] b) {
         double[] out;
-        if (a.length == b[0].length) {
+        if (a.length != b.length) {
             throw new RuntimeException("vector and matrix dimension mismatch");
         } else {
             out = new double[b[0].length];
@@ -118,6 +118,69 @@ public class MathV{
             }
         }
 
+        return out;
+    }
+
+    public static double sum(double[] x){
+        double out = 0;
+        for(double i : x){
+            out += i;
+        }
+        return out;
+    }
+
+    public static double sum(double[][] x) {
+        double out = 0;
+        for (double[] i : x) {
+            for(double j : i){
+                out += j;
+            }
+        }
+        return out;
+    }
+
+    public static double round(double x, int n){
+        double epsilon = 0.00000001d;
+        double multiplied = Math.pow(10,n) * x;
+        double remainder = multiplied - Math.floor(multiplied);
+        multiplied = Math.floor(multiplied);
+
+        if(Double.compare(1 - remainder, remainder) == 0){
+            multiplied += 1;
+        }else if(Math.abs((1 - remainder) - remainder) < epsilon){
+            multiplied += 1;
+        }
+
+        if(1 - remainder < remainder){
+            multiplied += 1;
+        }
+
+        return multiplied/Math.pow(10,n);
+    }
+
+    public static double[] round(double[] x, int n){
+        double[] out = x.clone();
+        for(int i = 0; i < x.length; i++){
+            x[i] = MathV.round(x[i], n);
+        }
+        return x;
+    }
+
+    public static double[][] round(double[][] x, int n) {
+        double[][] out = x.clone();
+        for (int i = 0; i < x.length; i++) {
+            for(int j = 0; j < x[i].length; j++){
+                x[i][j] = MathV.round(x[i][j], n);
+            }
+        }
+        return x;
+    }
+
+    public static double[] pow(double[] x, int n){
+        double[] out = x.clone();
+        for(int i = 0; i < x.length; i++){
+            out[i] = Math.pow(out[i],n);
+        }
         return out;
     }
 
