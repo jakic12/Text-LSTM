@@ -12,7 +12,8 @@ double[] settings = {
     1, // maximum random bias activation      5
 
     1, // activation function 1 = sigmoid     6
-    1  // error function 1 = quadratic        7
+    1, // error function 1 = quadratic        7
+    0.01 // learning rate                     8  
 };
 ```
 
@@ -66,6 +67,9 @@ double[] targetOutput = new double[]{1,1,0};
 testMlp.backpropagate(targetOutput);
 ```
 
-
-
-
+backpropagate ( forward propagation isn't required before )
+```java
+double[] exampleInput = new double[]{1,0,1};
+double[] targetOutput = new double[]{1,1,0};
+testMlp.backpropagate(exampleInput,targetOutput);
+```
