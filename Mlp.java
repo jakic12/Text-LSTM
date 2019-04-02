@@ -12,7 +12,10 @@ public class Mlp{
         1, // maximum random bias activation      5
 
         1, // activation function 1 = sigmoid     6
-        1  // error function 1 = quadratic        7
+        1, // error function 1 = quadratic        7
+        1, // learning rate                       8  
+        0, //softmax
+
     };
 
     double[][] neurons; 
@@ -133,17 +136,42 @@ public class Mlp{
         return out;
     }
 
-    public void backpropagate(double[] expOut){
-        // backpropagates the network 
+    public void backpropagate(double[] input, double[] expOut){
+        // backpropagates the network
+
+        this.forward(input, expOut);
+        this.backpropagate(expOut);
+        this.forward(input, expOut);
+    }
+    
+    public void backpropagate(double[] expOut) {
+        // backpropagates the network
         // needs forward propagation first
 
-        double[][] dneuron = MathV.emptyLike(this.neurons.length, this.neurons);
+        double[][] dneurons = MathV.emptyLike(this.neurons);
 
-        for(int layer = this.neurons.length - 1; layer > 0; layer++){
-            if(layer == this.neurons.length - 1){
+        for (int layer = this.neurons.length - 1; layer >= 0; layer--) {
+            if (layer == this.neurons.length - 1) {
+                dneurons[layer] = dErrorFunction(this.neurons[layer], expOut);
+            } else {
+                // calculate 𝛿
+                if(layer != 0){ // don't need to calculate changes for input layer
+                    for (int i = 0; i < this.dimensions[layer]; i++) {
+                        for (int j = 0; j < this.dimensions[layer + 1]; j++) {
+                            dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
+                        }
+                        dneurons[layer][i] = MathV.dsigm(dneurons[layer][i]);
+                        this.neurons[layer][i] -= dneurons[layer][i];
+                    }
+                }
 
+                // update weights
+                for(int i = 0; i < this.dimensions[layer]; i++){
+                    for(int j = 0; j < this.dimensions[layer+1]; j++){
+                        this.synapses[layer][i][j] = -this.settings[8]*dneurons[layer+1][j]*this.neurons[layer][i];
+                    }
+                }
             }
-            this.neurons[layer] = 
         }
     }
 }

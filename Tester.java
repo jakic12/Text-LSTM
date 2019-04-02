@@ -47,7 +47,7 @@ public class Tester{
                 );
 
                 mathT.assertEqual(
-                    MathV.disgm(0d),
+                    MathV.dsigm(0d),
                     0.25d, 
                     "derivated sigmoid function"
                 );
@@ -143,12 +143,27 @@ public class Tester{
                     "forward propagation"
                 );
 
+                MlpT.assertEqual(
+                    (int)(testMlp.eval(new double[]{1,0,1})[1]*1000000)/1000000d,
+                    0.846423,
+                    "forward propagation ( eval )"
+                );
+
                 MlpT.assertTrue(
                     MathV.round(MathV.sum(Mlp.softmax(MathV.randomArray(3))),10) == 1,
                     "softmax function"
                 );
 
                 testMlp.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
+
+                testMlp.forward(new double[]{1,0,0}, new double[]{1,0,0});
+                double oldError = testMlp.error;
+                testMlp.backpropagate(new double[]{1,0,0});
+                testMlp.forward(new double[]{1,0,0},new double[]{1,0,0});
+                
+                MlpT.assertTrue( oldError > testMlp.error ,
+                    "backpropagation lowers error (lowered by " + (int)((oldError-testMlp.error)/oldError*100) + "%)"
+                );
 
             MlpT.printResult();
             mainT.assertTrue(MlpT.result(), "Mlp tests");
