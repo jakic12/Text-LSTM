@@ -93,59 +93,65 @@ public class Tester{
                     "elementwise exponentiations"
                 );
 
+                mathT.assertEqual(
+                    MathV.emptyLike(new double[][]{{1,2,3},{1,1},{1,2,3,4,5}}),
+                    new double[][]{{0,0,0},{0,0},{0,0,0,0,0}},
+                    "empty array like"
+                );
+
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
 
-            Tester cnnT = new Tester("Cnn");
+            Tester MlpT = new Tester("Mlp");
                 
-                //create testing Cnn object
-                Cnn testCnn = new Cnn(new int[]{3,2,2,3});
+                //create testing Mlp object
+                Mlp testMlp = new Mlp(new int[]{3,2,2,3});
 
-                cnnT.assertTrue( 
-                    testCnn.neurons[0].length == 3 &&
-                    testCnn.neurons[1].length == 2 &&  
-                    testCnn.neurons[2].length == 2 && 
-                    testCnn.neurons[3].length == 3
+                MlpT.assertTrue( 
+                    testMlp.neurons[0].length == 3 &&
+                    testMlp.neurons[1].length == 2 &&  
+                    testMlp.neurons[2].length == 2 && 
+                    testMlp.neurons[3].length == 3
                     , "neuron dimensions"
                 );
 
-                cnnT.assertTrue( 
-                    testCnn.synapses[0].length == 3 &&
-                    testCnn.synapses[1].length == 2 &&  
-                    testCnn.synapses[2].length == 2 && 
-                    testCnn.synapses[0][0].length == 2 &&
-                    testCnn.synapses[1][0].length == 2 &&  
-                    testCnn.synapses[2][0].length == 3
+                MlpT.assertTrue( 
+                    testMlp.synapses[0].length == 3 &&
+                    testMlp.synapses[1].length == 2 &&  
+                    testMlp.synapses[2].length == 2 && 
+                    testMlp.synapses[0][0].length == 2 &&
+                    testMlp.synapses[1][0].length == 2 &&  
+                    testMlp.synapses[2][0].length == 3
                     , "synapse dimensions"
                 );
 
-                testCnn.settings[1] = 1;
-                testCnn.settings[2] = 1;
-                testCnn.settings[3] = 0;
-                testCnn.randomlySetWeights();
+                testMlp.settings[1] = 1;
+                testMlp.settings[2] = 1;
+                testMlp.settings[3] = 0;
+                testMlp.randomlySetWeights();
 
-                cnnT.assertEqual(
-                    testCnn.synapses[0],
+                MlpT.assertEqual(
+                    testMlp.synapses[0],
                     new double[][]{{1,1},{1,1},{1,1}},
                     "weights initialized properly according to settings"
                 );
 
-                testCnn.forward(new double[]{1,0,1});
-                cnnT.assertEqual(
-                    (int)(testCnn.neurons[3][1]*1000000)/1000000d,
+                testMlp.forward(new double[]{1,0,1});
+                MlpT.assertEqual(
+                    (int)(testMlp.neurons[3][1]*1000000)/1000000d,
                     0.846423,
                     "forward propagation"
                 );
 
-                cnnT.assertTrue(
-                    MathV.round(MathV.sum(Cnn.softmax(MathV.randomArray(3))),10) == 1,
+                MlpT.assertTrue(
+                    MathV.round(MathV.sum(Mlp.softmax(MathV.randomArray(3))),10) == 1,
                     "softmax function"
                 );
 
-                testCnn.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
+                testMlp.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
 
-            cnnT.printResult();
-            mainT.assertTrue(cnnT.result(), "Cnn tests");
+            MlpT.printResult();
+            mainT.assertTrue(MlpT.result(), "Mlp tests");
 
         mainT.printResult();
     }
@@ -258,12 +264,12 @@ Tester mainTester = new Tester("overall");
     vectorT.printResult();
     mainTester.assertTrue(vectorT.result(), "Vector tests");
 
-    Tester cnnT = new Tester("Cnn");
-    cnnT.assertTrue(true, "test1");
-    cnnT.assertTrue(true, "test2");
-    cnnT.assertTrue(true, "test3");
-    cnnT.assertTrue(true, "test4");
-    cnnT.printResult();
-    mainTester.assertTrue(cnnT.result(), "Cnn tests");
+    Tester MlpT = new Tester("Mlp");
+    MlpT.assertTrue(true, "test1");
+    MlpT.assertTrue(true, "test2");
+    MlpT.assertTrue(true, "test3");
+    MlpT.assertTrue(true, "test4");
+    MlpT.printResult();
+    mainTester.assertTrue(MlpT.result(), "Mlp tests");
 mainTester.printResult();
 */

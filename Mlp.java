@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Cnn{
+public class Mlp{
 
     double[] settings = {
         1, // activate weights with random value  0
@@ -21,7 +21,9 @@ public class Cnn{
     int[] dimensions;
     double error;
 
-    public Cnn(int[] dimensions){
+    public Mlp(int[] dimensions){
+        // constructor, that initializes all the weights
+
         this.dimensions = dimensions;
 
         this.neurons = new double[this.dimensions.length][];
@@ -40,14 +42,33 @@ public class Cnn{
         }
     }
 
-    public Cnn(int[] dimensions, boolean randomlyAssign) {
+    public Mlp(int[] dimensions, boolean randomlyAssign) {
+        // constructor, so you can randomly assign weights if you can
+
         this(dimensions);
         if(randomlyAssign){
             randomlySetWeights();
         }
     }
 
+    public void errorFunction(double[] x, double[] t){
+        if (this.settings[7] == 1) {
+            this.error = MathV.sum(MathV.pow(MathV.sub(x, t), 2));
+        }else{
+            throw new RuntimeException("unknown error function setting");
+        }
+    }
+
+    public double[] dErrorFunction(double[] x, double[] t) {
+        if(this.settings[7] == 1){
+            return MathV.multiplyByDsigmArray(MathV.sub(x, t));
+        }
+        throw new RuntimeException("unknown error function setting");
+    }
+
     public void randomlySetWeights(){
+        // randomly sets weights
+
         for (int i = 0; i < this.dimensions.length; i++) {
             if (i != 0)
                 this.biases[i] = (this.settings[3] == 1)
@@ -63,6 +84,8 @@ public class Cnn{
     }
 
     public void forward(double[] input){
+        // standard forwardpropagation
+
         if(neurons[0].length != input.length){
             throw new RuntimeException("input and first layer of the network are not the same size");
         }else{
@@ -79,33 +102,48 @@ public class Cnn{
     }
 
     public void forward(double[] input, double[] expOut){
+        // forward propagation with expected out, for error calculation
+
         if(neurons[neurons.length-1].length != expOut.length){
             throw new RuntimeException("expected output and last layer of the network are not the same size");
         }else{
             forward(input);
-            if(this.settings[7] == 1){
-                this.error = MathV.sum(MathV.pow(MathV.sub(neurons[neurons.length - 1], expOut), 2));
-            }
+            errorFunction(neurons[neurons.length - 1], expOut);
         }
     }
 
     public double[] eval(double[] input){
+        // forwardpropagation that returns last layer
+
         forward(input);
         return this.neurons[this.neurons.length - 1];
     }
 
     public static double[] softmax(double[] input){
-        double[] out = input.clone();
+        // softmax of an array
 
+        double[] out = input.clone();
         for(int i = 0; i < input.length; i++){
             out[i] = Math.exp(out[i]);
         }
-
         double sumExp = MathV.sum(out);
-
         for(int i = 0; i < input.length; i++){
             out[i] = out[i] / sumExp;
         }
         return out;
+    }
+
+    public void backpropagate(double[] expOut){
+        // backpropagates the network 
+        // needs forward propagation first
+
+        double[][] dneuron = MathV.emptyLike(this.neurons.length, this.neurons);
+
+        for(int layer = this.neurons.length - 1; layer > 0; layer++){
+            if(layer == this.neurons.length - 1){
+
+            }
+            this.neurons[layer] = 
+        }
     }
 }

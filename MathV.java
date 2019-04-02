@@ -87,8 +87,24 @@ public class MathV{
         return x;
     }
 
-    public static double disgm(double x){
+    public static double dsigm(double x){
         return sigm(x) * ( 1 - sigm(x));
+    }
+
+    public static double[] dsigmArray(double[] x) {
+        double[] out = MathV.emptyLike(x);
+        for(int i = 0; i < out.length; i++){
+            out[i] = sigm(x[i]) * (1 - sigm(x[i]));   
+        }
+        return out;
+    }
+
+    public static double[] multiplyByDsigmArray(double[] x) {
+        double[] out = MathV.emptyLike(x);
+        for (int i = 0; i < out.length; i++) {
+            out[i] = x[i] * sigm(x[i]) * (1 - sigm(x[i]));
+        }
+        return out;
     }
 
     public static double[] randomArray(int size){
@@ -118,6 +134,18 @@ public class MathV{
             }
         }
 
+        return out;
+    }
+
+    public static double[] emptyLike(double[] x){
+        return new double[x.length];
+    }
+
+    public static double[][] emptyLike(double[][] x){
+        double[][] out = new double[x.length][];
+        for(int i = 0; i < out.length; i++){
+            out[i] = new double[x[i].length];
+        }
         return out;
     }
 
