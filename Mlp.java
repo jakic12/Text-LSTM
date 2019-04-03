@@ -13,9 +13,8 @@ public class Mlp{
 
         1, // activation function 1 = sigmoid     6
         1, // error function 1 = quadratic        7
-        1, // learning rate                       8  
-        0, //softmax
-
+        0.01, // learning rate                    8
+        0, // softmax output                      9
     };
 
     double[][] neurons; 
@@ -40,7 +39,7 @@ public class Mlp{
                 this.biases[i] = new double[this.dimensions[i]];
 
             if (i < this.dimensions.length - 1) {
-                synapses[i] = new double[this.dimensions[i]][this.dimensions[i + 1]];
+                this.synapses[i] = new double[this.dimensions[i]][this.dimensions[i + 1]];
             }
         }
     }
@@ -55,6 +54,8 @@ public class Mlp{
     }
 
     public void errorFunction(double[] x, double[] t){
+        x = x.clone();
+        t = t.clone();
         if (this.settings[7] == 1) {
             this.error = MathV.sum(MathV.pow(MathV.sub(x, t), 2));
         }else{
@@ -79,7 +80,7 @@ public class Mlp{
                         : new double[this.dimensions[i]];
 
             if (i < this.dimensions.length - 1) {
-                synapses[i] = (this.settings[0] == 1)
+                this.synapses[i] = (this.settings[0] == 1)
                         ? MathV.randomArray(this.dimensions[i + 1], this.dimensions[i], this.settings[1], this.settings[2])
                         : new double[this.dimensions[i]][this.dimensions[i + 1]];
             }
@@ -89,29 +90,33 @@ public class Mlp{
     public void forward(double[] input){
         // standard forwardpropagation
 
-        if(neurons[0].length != input.length){
+        if(this.neurons[0].length != input.length){
             throw new RuntimeException("input and first layer of the network are not the same size");
         }else{
-            neurons[0] = input;
+            this.neurons[0] = input;
             
-            for(int i = 1; i < neurons.length; i++){
-                neurons[i] = MathV.dot(neurons[i-1],synapses[i-1]);
-                neurons[i] = MathV.add(neurons[i], biases[i]);
+            for(int i = 1; i < this.neurons.length; i++){
+                this.neurons[i] = MathV.dot(neurons[i-1],synapses[i-1]);
+                this.neurons[i] = MathV.add(neurons[i], biases[i]);
 
                 if(settings[6] == 1)
-                    neurons[i] = MathV.sigmArray(neurons[i]);
+                    this.neurons[i] = MathV.sigmArray(this.neurons[i]);
             }
+        }
+
+        if(this.settings[9] == 1){
+            this.neurons[this.neurons.length - 1] = softmax( this.neurons[this.neurons.length - 1] );
         }
     }
 
     public void forward(double[] input, double[] expOut){
         // forward propagation with expected out, for error calculation
 
-        if(neurons[neurons.length-1].length != expOut.length){
+        if(this.neurons[neurons.length-1].length != expOut.length){
             throw new RuntimeException("expected output and last layer of the network are not the same size");
         }else{
             forward(input);
-            errorFunction(neurons[neurons.length - 1], expOut);
+            errorFunction(this.neurons[neurons.length - 1], expOut);
         }
     }
 
@@ -148,30 +153,53 @@ public class Mlp{
         // backpropagates the network
         // needs forward propagation first
 
+        backpropagateDarray(dErrorFunction(this.neurons[this.neurons.length - 1], expOut));
+    }
+
+    public double[] backpropagateDarray(double[] out_derivative) {
+        // backpropagates the network with a given derivatives of the last layer,
+        // and returns the derivative of the input layer
+
         double[][] dneurons = MathV.emptyLike(this.neurons);
 
-        for (int layer = this.neurons.length - 1; layer >= 0; layer--) {
-            if (layer == this.neurons.length - 1) {
-                dneurons[layer] = dErrorFunction(this.neurons[layer], expOut);
-            } else {
-                // calculate 𝛿
-                if(layer != 0){ // don't need to calculate changes for input layer
-                    for (int i = 0; i < this.dimensions[layer]; i++) {
-                        for (int j = 0; j < this.dimensions[layer + 1]; j++) {
-                            dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
-                        }
-                        dneurons[layer][i] = MathV.dsigm(dneurons[layer][i]);
-                        this.neurons[layer][i] -= dneurons[layer][i];
-                    }
-                }
+        dneurons[dneurons.length -1] = out_derivative;
 
-                // update weights
-                for(int i = 0; i < this.dimensions[layer]; i++){
-                    for(int j = 0; j < this.dimensions[layer+1]; j++){
-                        this.synapses[layer][i][j] = -this.settings[8]*dneurons[layer+1][j]*this.neurons[layer][i];
-                    }
+        for (int layer = this.neurons.length - 2; layer >= 0; layer--) {
+            // calculate 𝛿
+            for (int i = 0; i < this.dimensions[layer]; i++) {
+                for (int j = 0; j < this.dimensions[layer + 1]; j++) {
+                    dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
+                }
+                dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
+                //this.neurons[layer][i] -= dneurons[layer][i];
+            }
+
+            for(int i = 0; i < this.dimensions[layer]; i++){
+                if(layer != 0)
+                    this.biases[layer][i] += -this.settings[8] * dneurons[layer][i];
+            }
+
+            // update weights
+            for (int i = 0; i < this.dimensions[layer]; i++) {
+                for (int j = 0; j < this.dimensions[layer + 1]; j++) {
+                    this.synapses[layer][i][j] += -this.settings[8] * dneurons[layer + 1][j] * this.neurons[layer][i];
                 }
             }
+        }
+
+        return dneurons[0];
+    }
+
+    public void learn(double[][] training_in, double[][] training_out, int epochs, int iterations){
+        for(int epoch = 0; epoch < epochs; epoch++){
+            double errSum = 0;
+            for (int i = 0; i < training_in.length; i++) {
+                for(int iter = 0; iter < iterations; iter++){
+                    this.backpropagate(training_in[i], training_out[i]);
+                    errSum += this.error;
+                }
+            }
+            errSum = errSum/(training_in.length*iterations);
         }
     }
 }

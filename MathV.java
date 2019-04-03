@@ -91,6 +91,11 @@ public class MathV{
         return sigm(x) * ( 1 - sigm(x));
     }
 
+    public static double dsigmNoSigm(double x) {
+        // dsigmoid with input allready sigmoided
+        return x * (1 - x);
+    }
+
     public static double[] dsigmArray(double[] x) {
         double[] out = MathV.emptyLike(x);
         for(int i = 0; i < out.length; i++){

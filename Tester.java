@@ -154,6 +154,16 @@ public class Tester{
                     "softmax function"
                 );
 
+                testMlp.settings[9] = 1;
+
+                MlpT.assertTrue(
+                    MathV.round(MathV.sum(testMlp.eval(new double[]{1,2,3})),10) == 1,
+                    "softmax at forwardpropagation"
+                );
+
+                testMlp.settings[9] = 0;
+                testMlp.settings[8] = 1;
+
                 testMlp.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
 
                 testMlp.forward(new double[]{1,0,0}, new double[]{1,0,0});
@@ -161,8 +171,23 @@ public class Tester{
                 testMlp.backpropagate(new double[]{1,0,0});
                 testMlp.forward(new double[]{1,0,0},new double[]{1,0,0});
                 
+                testMlp.settings[8] = 0.01;
+
                 MlpT.assertTrue( oldError > testMlp.error ,
                     "backpropagation lowers error (lowered by " + (int)((oldError-testMlp.error)/oldError*100) + "%)"
+                );
+
+                Mlp testMlp1 = new Mlp(new int[]{2,3,1});
+                testMlp1.settings[3] = 0;
+                testMlp1.randomlySetWeights();
+                testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000, 100);
+
+                MlpT.assertTrue(
+                    Math.round(testMlp1.eval(new double[]{0,0})[0]) == 0 &&
+                    Math.round(testMlp1.eval(new double[]{0,1})[0]) == 1 &&
+                    Math.round(testMlp1.eval(new double[]{1,0})[0]) == 1 &&
+                    Math.round(testMlp1.eval(new double[]{1,1})[0]) == 0,
+                    "can learn XOR"
                 );
 
             MlpT.printResult();
