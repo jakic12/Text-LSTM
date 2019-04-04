@@ -1,4 +1,7 @@
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Mlp{
 
@@ -15,6 +18,7 @@ public class Mlp{
         1, // error function 1 = quadratic        7
         0.01, // learning rate                    8
         0, // softmax output                      9
+        1, // output results to file output.json  10
     };
 
     double[][] neurons; 
@@ -191,6 +195,15 @@ public class Mlp{
     }
 
     public void learn(double[][] training_in, double[][] training_out, int epochs, int iterations){
+        PrintWriter out = null;
+        if(this.settings[10] == 1){
+            try{
+                out = new PrintWriter(new FileWriter("output.json"));
+                out.println("{\"errors\":[");
+            }catch(IOException e){
+                System.out.println("can not write to file output.json");
+            }
+        }
         for(int epoch = 0; epoch < epochs; epoch++){
             double errSum = 0;
             for (int i = 0; i < training_in.length; i++) {
@@ -200,6 +213,16 @@ public class Mlp{
                 }
             }
             errSum = errSum/(training_in.length*iterations);
+            if(this.settings[10] == 1 && out != null){
+                out.println(this.error + ((epoch != epochs-1)? ", " : ""));
+            }
+            System.out.println(errSum);
         }
+        if (this.settings[10] == 1 && out != null) {
+            out.println("]}");
+            out.close();
+        }
+
+        System.out.println("");
     }
 }

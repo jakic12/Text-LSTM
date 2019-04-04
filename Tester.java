@@ -179,8 +179,11 @@ public class Tester{
 
                 Mlp testMlp1 = new Mlp(new int[]{2,3,1});
                 testMlp1.settings[3] = 0;
+                testMlp1.settings[8] = 0.01;
                 testMlp1.randomlySetWeights();
                 testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000, 100);
+
+                MlpT.debugString = testMlp1.error + "";
 
                 MlpT.assertTrue(
                     Math.round(testMlp1.eval(new double[]{0,0})[0]) == 0 &&
