@@ -1,4 +1,7 @@
+package com.ml.other;
 import java.util.*;
+import com.ml.math.*;
+import com.ml.nn.*;
 
 public class Tester{
     public static void main(String[] args){
@@ -108,37 +111,37 @@ public class Tester{
                 Mlp testMlp = new Mlp(new int[]{3,2,2,3});
 
                 MlpT.assertTrue( 
-                    testMlp.neurons[0].length == 3 &&
-                    testMlp.neurons[1].length == 2 &&  
-                    testMlp.neurons[2].length == 2 && 
-                    testMlp.neurons[3].length == 3
+                    testMlp.getNeurons(0).length == 3 &&
+                    testMlp.getNeurons(1).length == 2 &&  
+                    testMlp.getNeurons(2).length == 2 && 
+                    testMlp.getNeurons(3).length == 3
                     , "neuron dimensions"
                 );
 
                 MlpT.assertTrue( 
-                    testMlp.synapses[0].length == 3 &&
-                    testMlp.synapses[1].length == 2 &&  
-                    testMlp.synapses[2].length == 2 && 
-                    testMlp.synapses[0][0].length == 2 &&
-                    testMlp.synapses[1][0].length == 2 &&  
-                    testMlp.synapses[2][0].length == 3
+                    testMlp.getSynapses(0).length == 3 &&
+                    testMlp.getSynapses(1).length == 2 &&  
+                    testMlp.getSynapses(2).length == 2 && 
+                    testMlp.getSynapses(0)[0].length == 2 &&
+                    testMlp.getSynapses(1)[0].length == 2 &&  
+                    testMlp.getSynapses(2)[0].length == 3
                     , "synapse dimensions"
                 );
 
-                testMlp.settings[1] = 1;
-                testMlp.settings[2] = 1;
-                testMlp.settings[3] = 0;
+                testMlp.setSetting(1,1);
+                testMlp.setSetting(2,1);
+                testMlp.setSetting(3,0);
                 testMlp.randomlySetWeights();
 
                 MlpT.assertEqual(
-                    testMlp.synapses[0],
+                    testMlp.getSynapses(0),
                     new double[][]{{1,1},{1,1},{1,1}},
                     "weights initialized properly according to settings"
                 );
 
                 testMlp.forward(new double[]{1,0,1});
                 MlpT.assertEqual(
-                    (int)(testMlp.neurons[3][1]*1000000)/1000000d,
+                    (int)(testMlp.getNeurons(3)[1]*1000000)/1000000d,
                     0.846423,
                     "forward propagation"
                 );
@@ -154,15 +157,15 @@ public class Tester{
                     "softmax function"
                 );
 
-                testMlp.settings[9] = 1;
+                testMlp.setSetting(9, 1);
 
                 MlpT.assertTrue(
                     MathV.round(MathV.sum(testMlp.eval(new double[]{1,2,3})),10) == 1,
                     "softmax at forwardpropagation"
                 );
 
-                testMlp.settings[9] = 0;
-                testMlp.settings[8] = 1;
+                testMlp.setSetting(9, 0);
+                testMlp.setSetting(8, 1);
 
                 testMlp.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
 
@@ -171,17 +174,17 @@ public class Tester{
                 testMlp.backpropagate(new double[]{1,0,0});
                 testMlp.forward(new double[]{1,0,0},new double[]{1,0,0});
                 
-                testMlp.settings[8] = 0.01;
+                testMlp.setSetting(8, 0.001);
 
                 MlpT.assertTrue( oldError > testMlp.error ,
                     "backpropagation lowers error (lowered by " + (int)((oldError-testMlp.error)/oldError*100) + "%)"
                 );
 
-                Mlp testMlp1 = new Mlp(new int[]{2,3,1});
-                testMlp1.settings[3] = 0;
-                testMlp1.settings[8] = 0.01;
+                Mlp testMlp1 = new Mlp(new int[]{2,2,1});
+                testMlp1.setSetting(3, 0);
+                testMlp1.setSetting(8, 0.01);
                 testMlp1.randomlySetWeights();
-                testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000, 100);
+                testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000000, 1);
 
                 MlpT.debugString = testMlp1.error + "";
 

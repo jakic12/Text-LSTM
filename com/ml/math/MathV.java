@@ -1,3 +1,5 @@
+package com.ml.math;
+
 public class MathV{
     public static double[] add(double[] a, double[] b){
         if(a.length != b.length){
@@ -35,6 +37,13 @@ public class MathV{
         }
         for(int i = 0; i < b.length; i++){
             a[i] /= b[i];
+        }
+        return a;
+    }
+
+    public static double[] div(double[] a, double b) {
+        for (int i = 0; i < a.length; i++) {
+            a[i] /= b;
         }
         return a;
     }

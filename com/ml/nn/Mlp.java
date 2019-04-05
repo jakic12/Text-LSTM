@@ -1,7 +1,11 @@
+package com.ml.nn;
+
 import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import com.ml.math.*;
 
 public class Mlp{
 
@@ -16,7 +20,7 @@ public class Mlp{
 
         1, // activation function 1 = sigmoid     6
         1, // error function 1 = quadratic        7
-        0.01, // learning rate                    8
+        0.005, // learning rate                    8
         0, // softmax output                      9
         1, // output results to file output.json  10
     };
@@ -25,7 +29,7 @@ public class Mlp{
     double[][] biases;
     double[][][] synapses;
     int[] dimensions;
-    double error;
+    public double error;
 
     public Mlp(int[] dimensions){
         // constructor, that initializes all the weights
@@ -48,6 +52,18 @@ public class Mlp{
         }
     }
 
+    public double[] getNeurons(int layer){
+        return this.neurons[layer];
+    }
+
+    public double[][] getSynapses(int layer) {
+        return this.synapses[layer];
+    }
+
+    public void setSetting(int settingIndex, double value) {
+        this.settings[settingIndex] = value;
+    }
+
     public Mlp(int[] dimensions, boolean randomlyAssign) {
         // constructor, so you can randomly assign weights if you can
 
@@ -61,7 +77,7 @@ public class Mlp{
         x = x.clone();
         t = t.clone();
         if (this.settings[7] == 1) {
-            this.error = MathV.sum(MathV.pow(MathV.sub(x, t), 2));
+            this.error = MathV.sum(MathV.div(MathV.pow(MathV.sub(x,t), 2), 2));
         }else{
             throw new RuntimeException("unknown error function setting");
         }
@@ -147,7 +163,7 @@ public class Mlp{
 
     public void backpropagate(double[] input, double[] expOut){
         // backpropagates the network
-
+        
         this.forward(input, expOut);
         this.backpropagate(expOut);
         this.forward(input, expOut);
@@ -168,27 +184,30 @@ public class Mlp{
 
         dneurons[dneurons.length -1] = out_derivative;
 
-        for (int layer = this.neurons.length - 2; layer >= 0; layer--) {
-            // calculate 𝛿
-            for (int i = 0; i < this.dimensions[layer]; i++) {
-                for (int j = 0; j < this.dimensions[layer + 1]; j++) {
-                    dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
+        for (int layer = this.neurons.length - 1; layer >= 0; layer--) {
+            if(this.neurons.length - 1 != layer){
+                // calculate 𝛿
+                for (int i = 0; i < this.dimensions[layer]; i++) {
+                    for (int j = 0; j < this.dimensions[layer + 1]; j++) {
+                        dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
+                    }
+                    dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
+                    //this.neurons[layer][i] -= dneurons[layer][i];
                 }
-                dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
-                //this.neurons[layer][i] -= dneurons[layer][i];
+                // update weights
+                for (int i = 0; i < this.dimensions[layer]; i++) {
+                    for (int j = 0; j < this.dimensions[layer + 1]; j++) {
+                        this.synapses[layer][i][j] += -this.settings[8] * dneurons[layer + 1][j] * this.neurons[layer][i];
+                    }
+                }
             }
 
-            for(int i = 0; i < this.dimensions[layer]; i++){
+            /*for(int i = 0; i < this.dimensions[layer]; i++){
                 if(layer != 0)
                     this.biases[layer][i] += -this.settings[8] * dneurons[layer][i];
-            }
+            }*/
 
-            // update weights
-            for (int i = 0; i < this.dimensions[layer]; i++) {
-                for (int j = 0; j < this.dimensions[layer + 1]; j++) {
-                    this.synapses[layer][i][j] += -this.settings[8] * dneurons[layer + 1][j] * this.neurons[layer][i];
-                }
-            }
+            
         }
 
         return dneurons[0];
@@ -225,4 +244,8 @@ public class Mlp{
 
         System.out.println("");
     }
+
+
+
+
 }
