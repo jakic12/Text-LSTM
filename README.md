@@ -14,7 +14,7 @@ double[] settings = {
     0.005, // learning rate                   8
     0, // softmax output                      9
     0, // output results to file output.json  10
-    1, // Graph data                          11
+    0, // Graph data                          11
     10, // graph every n epochs             12
 };
 ```
