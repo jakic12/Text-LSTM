@@ -86,3 +86,36 @@ inputs   outputs
 ```java
 testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000, 100);
 ```
+
+# Graph -> GraphingTool
+
+This is a graphing library which is kinda bad.
+
+## Example usage
+
+##### Create new graph object
+you can create the Graph object empty or with data
+
+```java
+Graph testGraph = new Graph();
+```
+or
+```java
+Graph testGraph = new Graph(new double[]{5,5,4,4,4,3,3,3,3,2,2,2,2,2,1,1,1,1,1});
+```
+
+##### Show the graph
+```java
+testGraph.showGraph("graph title");
+```
+##### Add data
+You can add data and the graph will update  
+You can add data as a `Point` object:
+```java
+testGraph.addData(new Point(19,10));
+```
+or as a value
+```java
+testGraph.addData(10);
+```
+or as an array of any of the two
