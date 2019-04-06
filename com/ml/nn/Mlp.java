@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import com.ml.math.*;
+import com.ml.gui.*;
 
 public class Mlp{
 
@@ -20,9 +21,11 @@ public class Mlp{
 
         1, // activation function 1 = sigmoid     6
         1, // error function 1 = quadratic        7
-        0.005, // learning rate                    8
+        0.005, // learning rate                   8
         0, // softmax output                      9
-        1, // output results to file output.json  10
+        0, // output results to file output.json  10
+        1, // Graph data                          11
+        10, // graph every n epochs             12
     };
 
     double[][] neurons; 
@@ -214,6 +217,11 @@ public class Mlp{
     }
 
     public void learn(double[][] training_in, double[][] training_out, int epochs, int iterations){
+        Graph g = null;
+        if(this.settings[11] == 1){
+            g = new Graph();
+            g.showGraph("mlp error");
+        }
         PrintWriter out = null;
         if(this.settings[10] == 1){
             try{
@@ -234,6 +242,9 @@ public class Mlp{
             errSum = errSum/(training_in.length*iterations);
             if(this.settings[10] == 1 && out != null){
                 out.println(this.error + ((epoch != epochs-1)? ", " : ""));
+            }
+            if(g != null && this.settings[11] == 1 && (epoch % this.settings[12] == 0)){
+                g.addData(errSum);
             }
             System.out.println(errSum);
         }

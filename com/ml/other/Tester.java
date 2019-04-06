@@ -2,6 +2,7 @@ package com.ml.other;
 import java.util.*;
 import com.ml.math.*;
 import com.ml.nn.*;
+import com.ml.gui.*;
 
 public class Tester{
     public static void main(String[] args){
@@ -102,6 +103,19 @@ public class Tester{
                     "empty array like"
                 );
 
+                mathT.assertTrue(
+                    MathV.limit(10,0,5) == 5 &&
+                    MathV.limit(-10,0,5) == 0 &&
+                    MathV.limit(3,0,5) == 3,
+                    "limit between 2 numbers"
+                );
+
+                mathT.assertTrue(
+                    MathV.map(110,0,100, -20, -10) == -9.0 &&
+                    MathV.map(20,0,40,20,100) == 60,
+                    "map number"
+                );
+
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
 
@@ -184,7 +198,7 @@ public class Tester{
                 testMlp1.setSetting(3, 0);
                 testMlp1.setSetting(8, 0.01);
                 testMlp1.randomlySetWeights();
-                testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000000, 1);
+                testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 100000, 10);
 
                 MlpT.debugString = testMlp1.error + "";
 
@@ -200,6 +214,7 @@ public class Tester{
             mainT.assertTrue(MlpT.result(), "Mlp tests");
 
         mainT.printResult();
+        //System.exit(0);
     }
 
     int testCount;
@@ -291,7 +306,8 @@ public class Tester{
         
         for(int i = 0; i < testCount; i++){
             if(testResults.get(i)){
-                System.out.println("    " + testNames.get(i) + " ✔️");
+                System.out.print("    " + testNames.get(i) + " ✔️\n");
+                //System.out.println("    " + testNames.get(i) + " ✔️"); random newlines get added ( probably just vscode )
             }else{
                 System.out.println("    " + testNames.get(i) + " ❌" + ((this.debugString != null)? "  " + this.debugString : ""));
             }

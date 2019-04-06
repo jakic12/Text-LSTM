@@ -226,4 +226,27 @@ public class MathV{
         return out;
     }
 
+    public static double limit(double x, double min, double max){
+        if(x < min){
+            x = min;   
+            return x;
+        }
+        if(x > max){
+            x = max;
+            return x;
+        }
+        return x;
+    }
+
+    public static double map(double x, double start, double end, double startScaled, double endScaled){
+        double maxRel = end - start;
+        double xRel = x - start;
+        double xFactor = xRel/maxRel;
+
+        double outMaxRel = endScaled - startScaled;
+        double outXRel = xFactor * outMaxRel;
+        double out = outXRel + startScaled;
+        return out;
+    }
+
 }
