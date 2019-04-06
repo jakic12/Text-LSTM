@@ -19,13 +19,13 @@ public class Mlp{
         0, // minimum random bias activation      4
         1, // maximum random bias activation      5
 
-        1, // activation function 1 = sigmoid     6
+        1, // activation function 1=sigm 2=tanh   6
         1, // error function 1 = quadratic        7
         0.005, // learning rate                   8
         0, // softmax output                      9
         0, // output results to file output.json  10
-        1, // Graph data                          11
-        10, // graph every n epochs             12
+        0, // Graph data                          11
+        10, // graph every n epochs               12
     };
 
     double[][] neurons; 
@@ -88,7 +88,12 @@ public class Mlp{
 
     public double[] dErrorFunction(double[] x, double[] t) {
         if(this.settings[7] == 1){
-            return MathV.multiplyByDsigmArray(MathV.sub(x, t));
+            double[] out = MathV.sub(x, t);
+            if(this.settings[6] == 1)
+                return MathV.multiply(out, MathV.dsigmArray(out));
+            if(this.settings[6] == 2){
+                return MathV.multiply(out, MathV.dtanhArray(out));
+            }
         }
         throw new RuntimeException("unknown error function setting");
     }
@@ -124,6 +129,8 @@ public class Mlp{
 
                 if(settings[6] == 1)
                     this.neurons[i] = MathV.sigmArray(this.neurons[i]);
+                if(settings[6] == 2)
+                    this.neurons[i] = MathV.tanhArray(this.neurons[i]);
             }
         }
 
@@ -194,7 +201,11 @@ public class Mlp{
                     for (int j = 0; j < this.dimensions[layer + 1]; j++) {
                         dneurons[layer][i] += this.synapses[layer][i][j] * dneurons[layer + 1][j];
                     }
-                    dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
+                    if(this.settings[6] == 1)
+                        dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
+                    if(this.settings[6] == 2)
+                        dneurons[layer][i] *= MathV.dtanhNoTanh(this.neurons[layer][i]);
+
                     //this.neurons[layer][i] -= dneurons[layer][i];
                 }
                 // update weights
@@ -246,7 +257,7 @@ public class Mlp{
             if(g != null && this.settings[11] == 1 && (epoch % this.settings[12] == 0)){
                 g.addData(errSum);
             }
-            System.out.println(errSum);
+            //System.out.println(errSum);
         }
         if (this.settings[10] == 1 && out != null) {
             out.println("]}");

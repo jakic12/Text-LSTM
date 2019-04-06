@@ -12,6 +12,7 @@ public class MathV{
     }
 
     public static double[] sub(double[] a, double[] b){
+        a = a.clone();
         if(a.length != b.length){
             throw new RuntimeException("vector length mismatch");
         }
@@ -22,6 +23,7 @@ public class MathV{
     }
 
     public static double[] multiply(double[] a, double[] b){
+        a = a.clone();
         if(a.length != b.length){
             throw new RuntimeException("vector length mismatch");
         }
@@ -96,6 +98,33 @@ public class MathV{
         return x;
     }
 
+    public static double[] tanhArray(double[] x){
+        double[] out = new double[x.length];
+        for(int i = 0; i < out.length ; i++){
+            out[i] = Math.tanh(x[i]);
+        }
+        return out;
+    }
+
+    public static double dtanhNoTanh(double x){
+        // tanh derivative with input allready tanh'd
+        return 1 - Math.pow(x,2);
+    }
+
+    public static double dtanh(double x) {
+        // tanh derivative with input allready tanh'd
+        return 1 - Math.pow(Math.tanh(x), 2);
+    }
+
+    public static double[] dtanhArray(double[] x) {
+        // tanh derivative with input allready tanh'd
+        x = x.clone();
+        for (int i = 0; i < x.length; i++) {
+            x[i] = dtanh(x[i]);
+        }
+        return x;
+    }
+
     public static double dsigm(double x){
         return sigm(x) * ( 1 - sigm(x));
     }
@@ -106,17 +135,10 @@ public class MathV{
     }
 
     public static double[] dsigmArray(double[] x) {
+        x = x.clone();
         double[] out = MathV.emptyLike(x);
         for(int i = 0; i < out.length; i++){
             out[i] = sigm(x[i]) * (1 - sigm(x[i]));   
-        }
-        return out;
-    }
-
-    public static double[] multiplyByDsigmArray(double[] x) {
-        double[] out = MathV.emptyLike(x);
-        for (int i = 0; i < out.length; i++) {
-            out[i] = x[i] * sigm(x[i]) * (1 - sigm(x[i]));
         }
         return out;
     }
@@ -247,6 +269,18 @@ public class MathV{
         double outXRel = xFactor * outMaxRel;
         double out = outXRel + startScaled;
         return out;
+    }
+
+    public static double[] concat(double[] a, double[] b){
+        double[] out = new double[a.length + b.length];
+        for(int i = 0; i < out.length; i++){
+            out[i] = (i < a.length)? a[i] : b[i-a.length];
+        }
+        return out;
+    }
+
+    public static void sop(String x){
+        System.out.println(x);
     }
 
 }

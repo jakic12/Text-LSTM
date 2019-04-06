@@ -1,0 +1,1 @@
+javac com/ml/other/Tester.java && java com.ml.other.Tester

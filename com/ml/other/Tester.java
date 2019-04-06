@@ -1,13 +1,14 @@
 package com.ml.other;
 import java.util.*;
 import com.ml.math.*;
-import com.ml.nn.*;
+import com.ml.nn.Mlp;
+import com.ml.nn.LstmCell;
 import com.ml.gui.*;
 
 public class Tester{
     public static void main(String[] args){
         Tester mainT = new Tester("Overall");
-
+            /*
             Tester mathT = new Tester("MathV");
 
                 mathT.assertEqual(
@@ -116,6 +117,18 @@ public class Tester{
                     "map number"
                 );
 
+                mathT.assertEqual(
+                    MathV.concat(new double[]{1,2,3}, new double[]{4,5,6}),
+                    new double[]{1,2,3,4,5,6},
+                    "concat vector"
+                );
+
+                mathT.assertEqual(
+                    MathV.tanhArray(new double[]{0,3,-3}),
+                    new double[]{0, 0.9950547536867305,-0.9950547536867305},
+                    "tanhArray"
+                );
+
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
 
@@ -187,16 +200,28 @@ public class Tester{
                 double oldError = testMlp.error;
                 testMlp.backpropagate(new double[]{1,0,0});
                 testMlp.forward(new double[]{1,0,0},new double[]{1,0,0});
-                
-                testMlp.setSetting(8, 0.001);
 
                 MlpT.assertTrue( oldError > testMlp.error ,
                     "backpropagation lowers error (lowered by " + (int)((oldError-testMlp.error)/oldError*100) + "%)"
                 );
 
+                testMlp.setSetting(6,2);
+
+                testMlp.forward(new double[]{1,0,0}, new double[]{1,0,0});
+                oldError = testMlp.error;
+                testMlp.backpropagate(new double[]{1,0,0});
+                testMlp.forward(new double[]{1,0,0},new double[]{1,0,0});
+
+                MlpT.assertTrue( oldError > testMlp.error ,
+                    "backpropagation with tanh lowers error (lowered by " + (int)((oldError-testMlp.error)/oldError*100) + "%)"
+                );
+                
+                testMlp.setSetting(8, 0.001);
+
                 Mlp testMlp1 = new Mlp(new int[]{2,2,1});
                 testMlp1.setSetting(3, 0);
                 testMlp1.setSetting(8, 0.01);
+                testMlp1.setSetting(11,1);
                 testMlp1.randomlySetWeights();
                 testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 100000, 10);
 
@@ -207,11 +232,41 @@ public class Tester{
                     Math.round(testMlp1.eval(new double[]{0,1})[0]) == 1 &&
                     Math.round(testMlp1.eval(new double[]{1,0})[0]) == 1 &&
                     Math.round(testMlp1.eval(new double[]{1,1})[0]) == 0,
-                    "can learn XOR"
+                    "sigmoid can learn XOR"
+                );
+
+                Mlp testMlp2 = new Mlp(new int[]{2,2,1});
+                testMlp2.setSetting(3, 0);
+                testMlp2.setSetting(8, 0.01);
+                testMlp2.setSetting(6, 2);
+                testMlp2.setSetting(11,1);
+                testMlp2.randomlySetWeights();
+                testMlp2.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 100000, 10);
+
+                MlpT.debugString = testMlp2.error + "";
+
+                MlpT.assertTrue(
+                    Math.round(testMlp2.eval(new double[]{0,0})[0]) == 0 &&
+                    Math.round(testMlp2.eval(new double[]{0,1})[0]) == 1 &&
+                    Math.round(testMlp2.eval(new double[]{1,0})[0]) == 1 &&
+                    Math.round(testMlp2.eval(new double[]{1,1})[0]) == 0,
+                    "tanh can learn XOR"
                 );
 
             MlpT.printResult();
-            mainT.assertTrue(MlpT.result(), "Mlp tests");
+            mainT.assertTrue(MlpT.result(), "MLP tests");
+            */
+            Tester lstm = new Tester("LSTM");
+                // 0 - t, 1 - e, 2 - s
+                double[][] testTestData = new double[][]{{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}};
+                double[][] testExpData = new double[][]{{1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}, {0,0,0}};
+
+                LstmCell cell1 = new LstmCell(3,3);
+                cell1.forward(testTestData[0], new double[]{0,0,0}, new double[]{0,0,0});
+                System.out.println(Arrays.toString(cell1.h));
+
+            lstm.printResult();
+            mainT.assertTrue(lstm.result(), "LSTM tests");
 
         mainT.printResult();
         //System.exit(0);

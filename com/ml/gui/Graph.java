@@ -233,7 +233,6 @@ class GraphPanel extends JPanel{
                     screenPosition.add(difference);
                     start.x = end.x;
                     start.y = end.y;
-                    System.out.println(screenPosition.x + " " + screenPosition.y);
                     repaint();
                 }
             }
