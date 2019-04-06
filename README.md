@@ -6,15 +6,16 @@ double[] settings = {
     1, // activate weights with random value  0
     0, // minimum random weight activation    1
     1, // maximum random weight activation    2
-    
     1, // activate biases with random value   3
     0, // minimum random bias activation      4
     1, // maximum random bias activation      5
-    
     1, // activation function 1 = sigmoid     6
     1, // error function 1 = quadratic        7
-    0.01, // learning rate                    8
+    0.005, // learning rate                   8
     0, // softmax output                      9
+    0, // output results to file output.json  10
+    0, // Graph data                          11
+    10, // graph every n epochs             12
 };
 ```
 
