@@ -3,6 +3,7 @@ import java.util.*;
 import com.ml.math.*;
 import com.ml.nn.Mlp;
 import com.ml.nn.LstmCell;
+import com.ml.nn.LstmChain;
 import com.ml.gui.*;
 
 public class Tester{
@@ -273,6 +274,19 @@ public class Tester{
                     cell1.error - oldError < 0,
                     "lstm cell lowers error " + (((oldError-cell1.error)/cell1.error*100) + "").substring(0,4) + "%"
                 );
+
+                testTestData = new double[][]{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1},{0,1,0,0}};
+                testExpData = new double[][]{{0,1,0,0},{0,0,1,0},{0,0,0,1},{0,1,0,0},{1,0,0,0}};
+                LstmCell cell2 = new LstmCell(4, 4);
+                LstmChain chain = new LstmChain(cell2);
+                chain.learn(testTestData, testExpData, 1000000);
+
+                // TODO assert all of these
+                System.out.println(Arrays.toString( chain.cell.eval(new double[]{1,0,0,0}) ));
+                System.out.println(Arrays.toString( chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c) ));
+                System.out.println(Arrays.toString(chain.cell.eval(new double[]{0,0,1,0}, chain.cell.h, chain.cell.c)));
+                System.out.println(Arrays.toString( chain.cell.eval(new double[]{0,0,0,1}, chain.cell.h, chain.cell.c) ));
+                System.out.println(Arrays.toString(chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c)));
 
             lstmT.printResult();
             mainT.assertTrue(lstmT.result(), "LSTM tests");

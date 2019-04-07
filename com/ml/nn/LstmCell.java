@@ -15,13 +15,11 @@ public class LstmCell {
     public double[] h;
     public double error;
 
-    private double[] dCt_1;
-    private double[] dht_1;
+    public double[] dCt_1;
+    public double[] dht_1;
 
     private int inSize;
     private int outSize;
-
-
 
     public LstmCell(int inputSize, int outputSize){
         this.inSize = inputSize;
@@ -82,6 +80,11 @@ public class LstmCell {
 
     public double[] eval(double[] x, double[] h, double[] c) {
         forward(x, h, c);
+        return this.h;
+    }
+
+    public double[] eval(double[] x) {
+        forward(x);
         return this.h;
     }
 
