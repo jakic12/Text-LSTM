@@ -256,17 +256,26 @@ public class Tester{
             MlpT.printResult();
             mainT.assertTrue(MlpT.result(), "MLP tests");
             */
-            Tester lstm = new Tester("LSTM");
+
+            Tester lstmT = new Tester("LSTM");
                 // 0 - t, 1 - e, 2 - s
                 double[][] testTestData = new double[][]{{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}};
                 double[][] testExpData = new double[][]{{1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}, {0,0,0}};
+                LstmCell cell1 = new LstmCell(3, 3);
 
-                LstmCell cell1 = new LstmCell(3,3);
-                cell1.forward(testTestData[0], new double[]{0,0,0}, new double[]{0,0,0});
-                System.out.println(Arrays.toString(cell1.h));
+                cell1.forward(testTestData[1], testExpData[1]);
+                double oldError = cell1.error;
+                        
+                cell1.backpropagate(testTestData[1], new double[3], new double[3], testExpData[1]);
+                cell1.forward(testTestData[1], testExpData[1]);
 
-            lstm.printResult();
-            mainT.assertTrue(lstm.result(), "LSTM tests");
+                lstmT.assertTrue(
+                    cell1.error - oldError < 0,
+                    "lstm cell lowers error " + (((oldError-cell1.error)/cell1.error*100) + "").substring(0,4) + "%"
+                );
+
+            lstmT.printResult();
+            mainT.assertTrue(lstmT.result(), "LSTM tests");
 
         mainT.printResult();
         //System.exit(0);

@@ -86,6 +86,10 @@ public class Mlp{
         }
     }
 
+    public double[] getOut(){
+        return this.neurons[this.neurons.length - 1];
+    }
+
     public double[] dErrorFunction(double[] x, double[] t) {
         if(this.settings[7] == 1){
             double[] out = MathV.sub(x, t);
@@ -154,7 +158,7 @@ public class Mlp{
         // forwardpropagation that returns last layer
 
         forward(input);
-        return this.neurons[this.neurons.length - 1];
+        return this.getOut();
     }
 
     public static double[] softmax(double[] input){
@@ -216,10 +220,10 @@ public class Mlp{
                 }
             }
 
-            /*for(int i = 0; i < this.dimensions[layer]; i++){
+            for(int i = 0; i < this.dimensions[layer]; i++){
                 if(layer != 0)
                     this.biases[layer][i] += -this.settings[8] * dneurons[layer][i];
-            }*/
+            }
 
             
         }
