@@ -67,7 +67,8 @@ public class DataManager{
 
     public static char[] buildCharVocab(String x){
         char[] out = getUniqueChars(x);
+        return MathV.sortArray(out);
     }
 
-    
+
 }

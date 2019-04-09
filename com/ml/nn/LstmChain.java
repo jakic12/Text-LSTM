@@ -18,6 +18,9 @@ public class LstmChain{
     public boolean graphProgress = true;
     public boolean graphAll = false;
 
+    public double lowerLearningRateRate = 0; // how much to lower the learning rate every numOfEpochsToLower epochs
+    public int numOfEpochsToLower = 1;
+
     Graph[] gT;
     
     public static void main(String[] args) {
@@ -61,9 +64,13 @@ public class LstmChain{
 
         for(int epoch = 0; epoch < epochs; epoch++){
             double error = forward(testData, expData);
-            System.out.println(error);
+            //System.out.println(error);
             g.addData(error);
             backpropagate(testData, expData);
+
+            if(epoch % numOfEpochsToLower == 0){
+                this.cell.incrementAllSetting(8, -lowerLearningRateRate);
+            }
         }
 
         System.out.println("end");
