@@ -21,10 +21,14 @@ public class LstmCell {
     private int inSize;
     private int outSize;
 
+    public int[] mlpDimensions;
+
     public LstmCell(int inputSize, int outputSize){
         this.inSize = inputSize;
         this.outSize = outputSize;
         int combinedSize = inputSize + outputSize;
+
+        this.mlpDimensions = new int[]{combinedSize,3, outputSize};
 
         // this.gates[0] -> S0
         // this.gates[1] -> S1
@@ -33,20 +37,20 @@ public class LstmCell {
         
         gates = new Mlp[4];
         // forget gate
-        gates[0] = new Mlp(new int[]{combinedSize, outputSize});
+        gates[0] = new Mlp(this.mlpDimensions);
         gates[0].randomlySetWeights();
 
         // add sigm gate
-        gates[1] = new Mlp(new int[]{combinedSize, outputSize});
+        gates[1] = new Mlp(this.mlpDimensions);
         gates[1].randomlySetWeights();
 
         // add candidates
-        gates[3] = new Mlp(new int[]{combinedSize, outputSize});
+        gates[3] = new Mlp(this.mlpDimensions);
         gates[3].setSetting(6,2);
         gates[3].randomlySetWeights();
 
         // output gate
-        gates[2] = new Mlp(new int[]{combinedSize, outputSize});
+        gates[2] = new Mlp(this.mlpDimensions);
         gates[2].randomlySetWeights();
     }
 
@@ -129,27 +133,27 @@ public class LstmCell {
         double[][] dS = new double[4][dCt.length];
         this.dht_1 = new double[this.outSize];
         this.dCt_1 = new double[dht.length];
-
+        
         for(int n = 0; n < this.outSize; n++){
             dht[n] = (this.h[n] - expectedOut[n]) + dht1[n];
         }
-
+        
         for(int n = 0; n < this.outSize; n++){
             dCt[n] = dht[n] * MathV.dtanh(this.c[n]) * this.gates[2].getOut()[n] + dCt1[n];
         }
-
+        
         for(int n = 0; n < this.outSize; n++){
             dS[0][n] = dCt[n] * ct_1[n];
         }
-
+        
         for (int n = 0; n < this.outSize; n++) {
             dS[1][n] = dCt[n] * this.gates[2].getOut()[n];
         }
-
+        
         for (int n = 0; n < this.outSize; n++) {
             dS[2][n] = dht[n] * Math.tanh(this.c[n]);
         }
-
+        
         for (int n = 0; n < this.outSize; n++) {
             dS[3][n] = dCt[n] * this.gates[1].getOut()[n];
         }
@@ -159,16 +163,17 @@ public class LstmCell {
         for(int i = 0; i < dMlpS.length; i++){
             dMlpS[i] = this.gates[i].backpropagateDarray(dS[i]);
         }
-
+        /*
         for(int i = 0; i < 4; i++){ // loop trough all sigmoid gates
             for (int n = 0; n < this.outSize; n++) {
                 this.dht_1[n] += dS[i][n] * dMlpS[i][n];
             }   
         }
-
+        
         for(int n = 0; n < this.outSize; n++){
             this.dCt_1[n] = this.c[n] * this.gates[0].getOut()[n];
-        }
+        }*/
+        
     }
 
     public void backpropagate(double[] x, double[] ht_1, double[] ct_1, double[] expectedOut){

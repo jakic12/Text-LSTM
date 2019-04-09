@@ -21,7 +21,7 @@ public class Mlp{
 
         1, // activation function 1=sigm 2=tanh   6
         1, // error function 1 = quadratic        7
-        0.005, // learning rate                   8
+        0.05, // learning rate                   8
         0, // softmax output                      9
         0, // output results to file output.json  10
         0, // Graph data                          11

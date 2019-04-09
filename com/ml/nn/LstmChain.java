@@ -16,6 +16,9 @@ public class LstmChain{
     public LstmCell cell;
 
     public boolean graphProgress = true;
+    public boolean graphAll = false;
+
+    Graph[] gT;
     
     public static void main(String[] args) {
         // 0 - end/start,  1 - t,  2 - e, 3 - s
@@ -47,10 +50,18 @@ public class LstmChain{
         if (this.graphProgress) {
             g = new Graph();
             g.showGraph("lstm chain error");
+            if(this.graphAll){
+                gT = new Graph[testData.length];
+                for (int i = 0; i < testData.length; i++) {
+                    gT[i] = new Graph();
+                    gT[i].showGraph("test " + i);
+                }    
+            }
         }
 
         for(int epoch = 0; epoch < epochs; epoch++){
             double error = forward(testData, expData);
+            System.out.println(error);
             g.addData(error);
             backpropagate(testData, expData);
         }
@@ -73,6 +84,9 @@ public class LstmChain{
             this.c[t] = this.cell.c;
             this.h[t] = this.cell.h;
             sumError += this.cell.error;
+
+            if(this.gT != null)
+                this.gT[t].addData(this.cell.error);
         }
 
         return sumError/testData.length;

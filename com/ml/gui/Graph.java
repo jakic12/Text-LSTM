@@ -83,7 +83,7 @@ public class Graph{
     public ArrayList<Point> scaleCoordinates(ArrayList<Point> p) {
         ArrayList<Point> out = new ArrayList<Point>();
         for(int i = 0; i < p.size(); i++){
-            if(p != null)
+            if(p.get(i) != null)
                 out.add(this.scaleCoordinates(p.get(i)));
         }
         return out;

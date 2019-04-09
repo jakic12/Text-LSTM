@@ -279,8 +279,72 @@ public class MathV{
         return out;
     }
 
-    public static void sop(String x){
-        System.out.println(x);
+    public static int maxIndex(double[] x){
+        double max = x[0];
+        int index = 0;
+        for(int i = 1; i < x.length; i++){
+            if(x[i] > max){
+                max = x[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+
+    /**
+     * Takes in number to represent as vector
+     * example:
+     *  <code>
+     *      vectorifyIndex(2, 5) -> [0,0,1,0,0]
+     *  </code>
+     * 
+     * @param x the idex
+     * @param size the size of the output array
+     * @return
+     */
+    public static double[] vectorifyIndex(int x, int size){
+        double[] out = new double[size];
+        out[x] = 1;
+        return out;
+    }
+    
+    /**
+     * index of char element in a char array
+     * 
+     * @param x the array
+     * @param a the char to be found
+     * @return index of the char in the array
+     */
+    public static int indexOf(char[] x, char a){
+        for(int i = 0; i < x.length; i++){
+            if(x[i] == a)
+                return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Sorts a char array
+     * the method clones the object!
+     * 
+     * @param arr the array to get sorted
+     * @return the sorted array
+     */
+    public static char[] sortArray(char[] arr){
+        arr = arr.clone();
+        boolean again = false;
+        for(int i = 0; i < arr.length-1; i++){
+            if(arr[i] > arr[i+1]){
+                char temp = arr[i];
+                arr[i] = arr[i+1];
+                arr[i+1] = temp;
+                again = true;
+            }
+        }
+        if(again)
+            return sortArray(arr);
+        return arr;
     }
 
 }

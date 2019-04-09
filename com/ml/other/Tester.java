@@ -2,6 +2,7 @@ package com.ml.other;
 import java.util.*;
 import com.ml.math.*;
 import com.ml.nn.Mlp;
+import com.ml.nn.DataManager;
 import com.ml.nn.LstmCell;
 import com.ml.nn.LstmChain;
 import com.ml.gui.*;
@@ -9,7 +10,7 @@ import com.ml.gui.*;
 public class Tester{
     public static void main(String[] args){
         Tester mainT = new Tester("Overall");
-            /*
+            
             Tester mathT = new Tester("MathV");
 
                 mathT.assertEqual(
@@ -130,9 +131,28 @@ public class Tester{
                     "tanhArray"
                 );
 
+                mathT.assertEqual(
+                    MathV.indexOf(new char[]{'a','b','c'}, 'b'),
+                    1,
+                    "index of char array"
+                );
+
+                mathT.assertEqual(
+                    MathV.vectorifyIndex(2, 4),
+                    new double[]{0,0,1,0},
+                    "vectorfy"
+                );
+
+                mathT.assertEqual(
+                    MathV.sortArray(new char[]{'c', 'b', 'a'}),
+                    new char[]{'a', 'b', 'c'},
+                    "sort char array"
+                );
+
             mathT.printResult();
             mainT.assertTrue(mathT.result(), "MathV tests");
-
+            
+            /*
             Tester MlpT = new Tester("Mlp");
                 
                 //create testing Mlp object
@@ -257,39 +277,64 @@ public class Tester{
             MlpT.printResult();
             mainT.assertTrue(MlpT.result(), "MLP tests");
             */
+            /*
+            Tester DataManagerT = new Tester("DataManager");
 
+                DataManagerT.assertEqual(
+                    DataManager.stringToInCharExpChar("test"),
+                    new char[][]{{'t','e','s'},{'e','s','t'}},
+                    "stringToInCharExpChar"
+                );
+
+                DataManagerT.assertEqual(
+                    DataManager.vectorifyChar(new char[]{'t', 'e', 's'}, "test"),
+                    new double[][]{{1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}},
+                    "vectorify char ( single array )"
+                );
+
+            DataManagerT.printResult();
+            mainT.assertTrue(DataManagerT.result(), "DataManager tests");
+            
+            
             Tester lstmT = new Tester("LSTM");
                 // 0 - t, 1 - e, 2 - s
+                String testData = "test";
                 double[][] testTestData = new double[][]{{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}};
                 double[][] testExpData = new double[][]{{1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}, {0,0,0}};
                 LstmCell cell1 = new LstmCell(3, 3);
 
                 cell1.forward(testTestData[1], testExpData[1]);
-                double oldError = cell1.error;
+                double oldError1 = cell1.error;
                         
                 cell1.backpropagate(testTestData[1], new double[3], new double[3], testExpData[1]);
                 cell1.forward(testTestData[1], testExpData[1]);
 
+                double relativeError = ((oldError1-cell1.error)/cell1.error*100);
+                String out = ((relativeError + "").length() > 3)? (relativeError + "").substring(0,4) : relativeError + "";
+
                 lstmT.assertTrue(
-                    cell1.error - oldError < 0,
-                    "lstm cell lowers error " + (((oldError-cell1.error)/cell1.error*100) + "").substring(0,4) + "%"
+                    cell1.error - oldError1 < 0,
+                    "lstm cell lowers error " + out + "%"
                 );
+
+                char[] vocab = new char[]{'\n','t','e','s'};
 
                 testTestData = new double[][]{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1},{0,1,0,0}};
                 testExpData = new double[][]{{0,1,0,0},{0,0,1,0},{0,0,0,1},{0,1,0,0},{1,0,0,0}};
                 LstmCell cell2 = new LstmCell(4, 4);
                 LstmChain chain = new LstmChain(cell2);
-                chain.learn(testTestData, testExpData, 1000000);
+                chain.learn(testTestData, testExpData, 1000);
 
                 // TODO assert all of these
-                System.out.println(Arrays.toString( chain.cell.eval(new double[]{1,0,0,0}) ));
-                System.out.println(Arrays.toString( chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c) ));
-                System.out.println(Arrays.toString(chain.cell.eval(new double[]{0,0,1,0}, chain.cell.h, chain.cell.c)));
-                System.out.println(Arrays.toString( chain.cell.eval(new double[]{0,0,0,1}, chain.cell.h, chain.cell.c) ));
-                System.out.println(Arrays.toString(chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c)));
+                System.out.println(vocab[MathV.maxIndex(chain.cell.eval(new double[]{1,0,0,0}))]);
+                System.out.println(vocab[MathV.maxIndex(chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c))]);
+                System.out.println(vocab[MathV.maxIndex(chain.cell.eval(new double[]{0,0,1,0}, chain.cell.h, chain.cell.c))]);
+                System.out.println(vocab[MathV.maxIndex(chain.cell.eval(new double[]{0,0,0,1}, chain.cell.h, chain.cell.c))]);
+                System.out.println(vocab[MathV.maxIndex(chain.cell.eval(new double[]{0,1,0,0}, chain.cell.h, chain.cell.c))]);
 
             lstmT.printResult();
             mainT.assertTrue(lstmT.result(), "LSTM tests");
+            */
 
         mainT.printResult();
         //System.exit(0);
@@ -340,6 +385,23 @@ public class Tester{
         assertTrue(pass, testName);
     }
 
+    public void assertEqual(char[] a, char[] b, String testName) {
+        this.debugString = Arrays.toString(a);
+        boolean pass = true;
+        if (a.length == b.length) {
+            for (int i = 0; i < a.length; i++) {
+                if (a[i] != b[i]) {
+                    pass = false;
+                    break;
+                }
+            }
+        } else {
+            pass = false;
+        }
+
+        assertTrue(pass, testName);
+    }
+
     public void assertEqual(double[][] a, double[][] b, String testName){
         boolean pass = true;
         if(a.length == b.length && a[0].length == b[0].length){
@@ -352,6 +414,24 @@ public class Tester{
                 }
             }
         }else{
+            pass = false;
+        }
+
+        assertTrue(pass, testName);
+    }
+
+    public void assertEqual(char[][] a, char[][] b, String testName) {
+        boolean pass = true;
+        if (a.length == b.length && a[0].length == b[0].length) {
+            for (int i = 0; i < a.length; i++) {
+                for (int j = 0; j < a[i].length; j++) {
+                    if (a[i][j] != b[i][j]) {
+                        pass = false;
+                        break;
+                    }
+                }
+            }
+        } else {
             pass = false;
         }
 
