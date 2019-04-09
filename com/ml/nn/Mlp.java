@@ -21,7 +21,7 @@ public class Mlp{
 
         1, // activation function 1=sigm 2=tanh   6
         1, // error function 1 = quadratic        7
-        0.05, // learning rate                   8
+        0.005, // learning rate                   8
         0, // softmax output                      9
         0, // output results to file output.json  10
         0, // Graph data                          11
@@ -67,6 +67,10 @@ public class Mlp{
         this.settings[settingIndex] = value;
     }
 
+    public void incrementSetting(int settingIndex, double ammount) {
+        this.settings[settingIndex] += ammount;
+    }
+
     public Mlp(int[] dimensions, boolean randomlyAssign) {
         // constructor, so you can randomly assign weights if you can
 
@@ -93,11 +97,7 @@ public class Mlp{
     public double[] dErrorFunction(double[] x, double[] t) {
         if(this.settings[7] == 1){
             double[] out = MathV.sub(x, t);
-            if(this.settings[6] == 1)
-                return MathV.multiply(out, MathV.dsigmArray(out));
-            if(this.settings[6] == 2){
-                return MathV.multiply(out, MathV.dtanhArray(out));
-            }
+            return out;
         }
         throw new RuntimeException("unknown error function setting");
     }
@@ -189,7 +189,12 @@ public class Mlp{
 
         backpropagateDarray(dErrorFunction(this.neurons[this.neurons.length - 1], expOut));
     }
-
+    /**
+     * backpropagates the network with the given array of derivatives
+     * 
+     * @param out_derivative the derivative of the output layer
+     * @return the derivative of the first layer
+     */
     public double[] backpropagateDarray(double[] out_derivative) {
         // backpropagates the network with a given derivatives of the last layer,
         // and returns the derivative of the input layer
@@ -197,6 +202,12 @@ public class Mlp{
         double[][] dneurons = MathV.emptyLike(this.neurons);
 
         dneurons[dneurons.length -1] = out_derivative;
+
+        if (this.settings[6] == 1)
+            dneurons[dneurons.length -1] = MathV.multiply(dneurons[dneurons.length -1], MathV.dsigmArray(dneurons[dneurons.length -1]));
+        if (this.settings[6] == 2) {
+            dneurons[dneurons.length -1] = MathV.multiply(dneurons[dneurons.length -1], MathV.dtanhArray(dneurons[dneurons.length -1]));
+        }
 
         for (int layer = this.neurons.length - 1; layer >= 0; layer--) {
             if(this.neurons.length - 1 != layer){
