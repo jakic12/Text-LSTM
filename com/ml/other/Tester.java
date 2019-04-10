@@ -329,7 +329,7 @@ public class Tester{
                 LstmCell cell2 = new LstmCell(vocabulary.length, vocabulary.length);
                 
                 LstmChain chain = new LstmChain(cell2);
-                chain.learn(testTestData, testExpData, 100000);
+                chain.learn(testTestData, testExpData, 10000);
 
                 // TODO assert all of these
 

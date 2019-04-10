@@ -9,8 +9,10 @@ public class LstmCell {
     // settings
     public double learningRate = 0.01;
     public String errorFunction = "meanSquared";
+    public String gateMode = "weight"; // weight / mlp
     
-    public Mlp[] gates; 
+    public Mlp[] mlpGates; 
+    public double[][] weightGates;
     public double[] c;
     public double[] h;
     public double error;
@@ -30,32 +32,32 @@ public class LstmCell {
 
         this.mlpDimensions = new int[]{combinedSize,3, outputSize};
 
-        // this.gates[0] -> S0
-        // this.gates[1] -> S1
-        // this.gates[2] -> S2
-        // this.gates[3] -> T0
+        // this.mlpGates[0] -> S0
+        // this.mlpGates[1] -> S1
+        // this.mlpGates[2] -> S2
+        // this.mlpGates[3] -> T0
         
-        gates = new Mlp[4];
+        mlpGates = new Mlp[4];
         // forget gate
-        gates[0] = new Mlp(this.mlpDimensions);
-        gates[0].randomlySetWeights();
+        mlpGates[0] = new Mlp(this.mlpDimensions);
+        mlpGates[0].randomlySetWeights();
 
         // add sigm gate
-        gates[1] = new Mlp(this.mlpDimensions);
-        gates[1].randomlySetWeights();
+        mlpGates[1] = new Mlp(this.mlpDimensions);
+        mlpGates[1].randomlySetWeights();
 
         // add candidates
-        gates[3] = new Mlp(this.mlpDimensions);
-        gates[3].setSetting(6,2);
-        gates[3].randomlySetWeights();
+        mlpGates[3] = new Mlp(this.mlpDimensions);
+        mlpGates[3].setSetting(6,2);
+        mlpGates[3].randomlySetWeights();
 
         // output gate
-        gates[2] = new Mlp(this.mlpDimensions);
-        gates[2].randomlySetWeights();
+        mlpGates[2] = new Mlp(this.mlpDimensions);
+        mlpGates[2].randomlySetWeights();
 
-        for(int i = 0; i < 4; i++){ // for all gates
-            gates[i].setSetting(1,-1);
-            gates[i].setSetting(8, this.learningRate);
+        for(int i = 0; i < 4; i++){ // for all mlpGates
+            mlpGates[i].setSetting(1,-1);
+            mlpGates[i].setSetting(8, this.learningRate);
         }
     }
 
@@ -66,8 +68,8 @@ public class LstmCell {
      * @param value the value of the setting
      */
     public void setAllSettings(int index, double value){
-        for (int i = 0; i < 4; i++) { // for all gates
-            this.gates[i].setSetting(index, value);
+        for (int i = 0; i < 4; i++) { // for all mlpGates
+            this.mlpGates[i].setSetting(index, value);
         }
     }
     
@@ -78,8 +80,8 @@ public class LstmCell {
      * @param ammount the ammount for the setting to be incremented
      */
     public void incrementAllSetting(int index, double ammount){
-        for (int i = 0; i < 4; i++) { // for all gates
-            this.gates[i].incrementSetting(index, ammount);
+        for (int i = 0; i < 4; i++) { // for all mlpGates
+            this.mlpGates[i].incrementSetting(index, ammount);
         }
     }
     public void forward(double[] x, double[] h, double[] c){
@@ -90,11 +92,11 @@ public class LstmCell {
 
         c = c.clone();
         double[] combined = MathV.concat(x,h);
-        c = MathV.multiply(c, gates[0].eval(combined));
-        c = MathV.add(c, MathV.multiply(gates[1].eval(combined), gates[2].eval(combined)));
+        c = MathV.multiply(c, mlpGates[0].eval(combined));
+        c = MathV.add(c, MathV.multiply(mlpGates[1].eval(combined), mlpGates[2].eval(combined)));
         this.c = c.clone();
         c = MathV.tanhArray(c);
-        this.h = MathV.multiply(c,gates[3].eval(combined));
+        this.h = MathV.multiply(c,mlpGates[3].eval(combined));
     }
 
     public void forward(double[] x, double[] h, double[] c, double[] expected){
@@ -167,7 +169,7 @@ public class LstmCell {
         }
         
         for(int n = 0; n < this.outSize; n++){
-            dCt[n] = dht[n] * MathV.dtanh(this.c[n]) * this.gates[2].getOut()[n] + dCt1[n];
+            dCt[n] = dht[n] * MathV.dtanh(this.c[n]) * this.mlpGates[2].getOut()[n] + dCt1[n];
         }
         
         for(int n = 0; n < this.outSize; n++){
@@ -175,7 +177,7 @@ public class LstmCell {
         }
         
         for (int n = 0; n < this.outSize; n++) {
-            dS[1][n] = dCt[n] * this.gates[2].getOut()[n];
+            dS[1][n] = dCt[n] * this.mlpGates[2].getOut()[n];
         }
         
         for (int n = 0; n < this.outSize; n++) {
@@ -183,23 +185,23 @@ public class LstmCell {
         }
         
         for (int n = 0; n < this.outSize; n++) {
-            dS[3][n] = dCt[n] * this.gates[1].getOut()[n];
+            dS[3][n] = dCt[n] * this.mlpGates[1].getOut()[n];
         }
 
         //odvodi glede na vhode 
         double[][] dMlpS = new double[4][this.outSize + this.inSize]; 
         for(int i = 0; i < dMlpS.length; i++){
-            dMlpS[i] = this.gates[i].backpropagateDarray(dS[i]);
+            dMlpS[i] = this.mlpGates[i].backpropagateDarray(dS[i]);
         }
         
-        for(int i = 0; i < 4; i++){ // loop trough all sigmoid gates
+        for(int i = 0; i < 4; i++){ // loop trough all sigmoid mlpGates
             for (int n = 0; n < this.outSize; n++) {
                 this.dht_1[n] += dS[i][n] * dMlpS[i][n];
             }   
         }
-
+        
         for(int n = 0; n < this.outSize; n++){
-            this.dCt_1[n] = this.c[n] * this.gates[0].getOut()[n];
+            this.dCt_1[n] = this.c[n] * this.mlpGates[0].getOut()[n];
         }
         
     }
