@@ -2,6 +2,7 @@ package com.ml.math;
 
 public class MathV{
     public static double[] add(double[] a, double[] b){
+        a = a.clone();
         if(a.length != b.length){
             throw new RuntimeException("vector length mismatch");
         }
@@ -34,6 +35,7 @@ public class MathV{
     }
 
     public static double[] div(double[] a, double[] b){
+        a = a.clone();
         if(a.length != b.length){
             throw new RuntimeException("vector length mismatch");
         }
@@ -44,6 +46,7 @@ public class MathV{
     }
 
     public static double[] div(double[] a, double b) {
+        a = a.clone();
         for (int i = 0; i < a.length; i++) {
             a[i] /= b;
         }
@@ -92,6 +95,7 @@ public class MathV{
     }
 
     public static double[] sigmArray(double[] x){
+        x = x.clone();
         for(int i = 0; i < x.length; i++){
             x[i] = sigm(x[i]);
         }

@@ -303,6 +303,37 @@ public class Tester{
             */
             
             Tester lstmT = new Tester("LSTM");
+
+                /*LstmCell msWordTestCell = new LstmCell(2,1);
+
+                msWordTestCell.mlpGates[3].synapses[0][0][0] = 0.45;
+                msWordTestCell.mlpGates[3].synapses[0][1][0] = 0.25;
+                msWordTestCell.doubleGates[3].synapses[0][0][0] = 0.15;
+                msWordTestCell.doubleGates[3].biases[1][0] = 0.2;
+                msWordTestCell.mlpGates[3].biases[1][0] = 0;
+
+                msWordTestCell.mlpGates[1].synapses[0][0][0] = 0.95;
+                msWordTestCell.mlpGates[1].synapses[0][1][0] = 0.8;
+                msWordTestCell.doubleGates[1].synapses[0][0][0] = 0.8;
+                msWordTestCell.doubleGates[1].biases[1][0] = 0.65;
+                msWordTestCell.mlpGates[1].biases[1][0] = 0;
+
+                msWordTestCell.mlpGates[0].synapses[0][0][0] = 0.7;
+                msWordTestCell.mlpGates[0].synapses[0][1][0] = 0.45;
+                msWordTestCell.doubleGates[0].synapses[0][0][0] = 0.1;
+                msWordTestCell.doubleGates[0].biases[1][0] = 0.15;
+                msWordTestCell.mlpGates[0].biases[1][0] = 0;
+                
+                msWordTestCell.mlpGates[2].synapses[0][0][0] = 0.6;
+                msWordTestCell.mlpGates[2].synapses[0][1][0] = 0.4;
+                msWordTestCell.doubleGates[2].synapses[0][0][0] = 0.25;
+                msWordTestCell.doubleGates[2].biases[1][0] = 0.1;
+                msWordTestCell.mlpGates[2].biases[1][0] = 0;
+
+                LstmChain testChain2 = new LstmChain(msWordTestCell);
+
+                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);*/
+
                 // 0 - t, 1 - e, 2 - s
                 String testData = "cell1.forward(testTestData[1], testExpData[1]);";
                 char[][] data = DataManager.stringToInCharExpChar(testData);
@@ -329,16 +360,17 @@ public class Tester{
                 LstmCell cell2 = new LstmCell(vocabulary.length, vocabulary.length);
                 
                 LstmChain chain = new LstmChain(cell2);
-                chain.learn(testTestData, testExpData, 10000);
+                chain.learn(testTestData, testExpData, 1000000, vocabulary);
 
                 // TODO assert all of these
 
-                boolean chainTesting = true; // true - the last output is fed in the input, false - the tests are fed in the input
+                boolean chainTesting = false; // true - the last output is fed in the input, false - the tests are fed in the input
                 String testOutput = "";
+                testOutput += (vocabulary[MathV.maxIndex(testTestData[0])]);
                 testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(testTestData[0]))]);
-                for(int i = 0; i < testData.length()-1; i++){
+                for(int i = 1; i < testTestData.length; i++){
                     if(chainTesting)
-                        testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(chain.cell.h, chain.cell.h, chain.cell.c))]);
+                        testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(chain.cell.h), chain.cell.outSize), chain.cell.h, chain.cell.c))]);
                     else
                         testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(testTestData[i], chain.cell.h, chain.cell.c))]);
                 }

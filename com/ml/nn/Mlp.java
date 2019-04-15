@@ -19,7 +19,7 @@ public class Mlp{
         0, // minimum random bias activation      4
         1, // maximum random bias activation      5
 
-        1, // activation function 1=sigm 2=tanh   6
+        1, // activation function 1=sigm 2=tanh 0=none   6
         1, // error function 1 = quadratic        7
         0.005, // learning rate                   8
         0, // softmax output                      9
@@ -29,8 +29,8 @@ public class Mlp{
     };
 
     double[][] neurons; 
-    double[][] biases;
-    double[][][] synapses;
+    public double[][] biases;
+    public double[][][] synapses;
     int[] dimensions;
     public double error;
 
@@ -131,9 +131,9 @@ public class Mlp{
                 this.neurons[i] = MathV.dot(neurons[i-1],synapses[i-1]);
                 this.neurons[i] = MathV.add(neurons[i], biases[i]);
 
-                if(settings[6] == 1)
+                if(this.settings[6] == 1)
                     this.neurons[i] = MathV.sigmArray(this.neurons[i]);
-                if(settings[6] == 2)
+                else if(this.settings[6] == 2)
                     this.neurons[i] = MathV.tanhArray(this.neurons[i]);
             }
         }
@@ -195,7 +195,7 @@ public class Mlp{
      * @param out_derivative the derivative of the output layer
      * @return the derivative of the first layer
      */
-    public double[] backpropagateDarray(double[] out_derivative) {
+    public double[] backpropagateDarray(double[] out_derivative, Mlp network) {
         // backpropagates the network with a given derivatives of the last layer,
         // and returns the derivative of the input layer
 
@@ -218,7 +218,7 @@ public class Mlp{
                     }
                     if(this.settings[6] == 1)
                         dneurons[layer][i] *= MathV.dsigmNoSigm(this.neurons[layer][i]);
-                    if(this.settings[6] == 2)
+                    else if(this.settings[6] == 2)
                         dneurons[layer][i] *= MathV.dtanhNoTanh(this.neurons[layer][i]);
 
                     //this.neurons[layer][i] -= dneurons[layer][i];
@@ -226,7 +226,7 @@ public class Mlp{
                 // update weights
                 for (int i = 0; i < this.dimensions[layer]; i++) {
                     for (int j = 0; j < this.dimensions[layer + 1]; j++) {
-                        this.synapses[layer][i][j] += -this.settings[8] * dneurons[layer + 1][j] * this.neurons[layer][i];
+                        network.synapses[layer][i][j] += -this.settings[8] * dneurons[layer + 1][j] * this.neurons[layer][i];
                     }
                 }
             }
@@ -240,6 +240,10 @@ public class Mlp{
         }
 
         return dneurons[0];
+    }
+
+    public double[] backpropagateDarray(double[] out_derivative){
+        return backpropagateDarray(out_derivative, this);
     }
 
     public void learn(double[][] training_in, double[][] training_out, int epochs, int iterations){
@@ -280,6 +284,49 @@ public class Mlp{
         }
 
         System.out.println("");
+    }
+    /**
+     * converts mlp to array<br>
+     * structure:<br>
+     * <pre>
+     * out[0] -> 3D array
+     * out[1] -> array of 2D arrays
+     * out[2][0] -> array of 1D arrays
+     * 
+     * 
+     * out[0] = synapses
+     * 
+     * out[1][0] = neurons
+     * out[1][1] = biases
+     * 
+     * out[2][0][0] = settings
+     * 
+     * </pre>
+     * 
+     * @return the array
+     */
+    public double[][][][] toArray(){
+        double[][][][] out = new double[3][][][];
+        out[0] = this.synapses.clone();
+
+        out[1] = new double[2][][];
+        out[1][0] = this.neurons.clone();
+        out[1][1] = this.biases.clone();
+
+        out[2] = new double[1][1][];
+        out[2][0][0] = this.settings.clone();
+        return out;
+    }
+
+    public Mlp(double[][][][] arr){
+        this.dimensions = new int[arr[1][0].length];
+        for(int i = 0; i < dimensions.length; i++){
+            this.dimensions[i] = arr[1][0][i].length;
+        }
+        this.neurons = arr[1][0];
+        this.synapses = arr[0];
+        this.biases = arr[1][1];
+        this.settings = arr[2][0][0];
     }
 
 
