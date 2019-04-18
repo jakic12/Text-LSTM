@@ -1,4 +1,9 @@
 package com.ml.other;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import com.ml.math.*;
 import com.ml.nn.Mlp;
@@ -334,55 +339,40 @@ public class Tester{
 
                 testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);*/
 
-                // 0 - t, 1 - e, 2 - s
-                String testData = "cell1.forward(testTestData[1], testExpData[1]);";
-                char[][] data = DataManager.stringToInCharExpChar(testData);
-                char[] vocabulary = DataManager.buildCharVocab(testData);
+                // the test sentences - unsplit
+                String testSentences = null;
 
-                double[][] testTestData = DataManager.vectorifyChar(vocabulary, data[0]);
-                double[][] testExpData = DataManager.vectorifyChar(vocabulary, data[1]);
+				try {
+					testSentences = new String(Files.readAllBytes(Paths.get("testData/lstm_greek")) ,StandardCharsets.UTF_8);
+				} catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+				}
+                String[] testData = testSentences.split(",,");
+                /*for(int i = 0; i < testData.length-1; i++){
+                    testData[i] += " ";
+                }*/
+
+                //build vocabulary and change the chars to input output pairs
+                char[][][] data = DataManager.stringToInCharExpChar(testData);
+                char[] vocabulary = DataManager.buildCharVocab(testSentences);
+
+                //converts pairs to data - vectorifies all the chars
+                double[][][] testTestData = DataManager.vectorifyChar(vocabulary, data[0]);
+                double[][][] testExpData = DataManager.vectorifyChar(vocabulary, data[1]);
+
+                //create lstm cell and chain
                 LstmCell cell1 = new LstmCell(vocabulary.length, vocabulary.length);
+                LstmChain chain = new LstmChain(cell1);
 
-                cell1.forward(testTestData[1], testExpData[1]);
-                double oldError1 = cell1.error;
-                        
-                cell1.backpropagate(testTestData[1], new double[vocabulary.length], new double[vocabulary.length], testExpData[1]);
-                cell1.forward(testTestData[1], testExpData[1]);
+                //learn the data
+                chain.learn(testTestData, testExpData, 10000, 50);
 
-                double relativeError = ((oldError1-cell1.error)/cell1.error*100);
-                String out = ((relativeError + "").length() > 3)? (relativeError + "").substring(0,4) : relativeError + "";
+                //generate sentences
+                double[][] out = chain.forwardWithVectorify(DataManager.vectorifyChar(vocabulary, testSentences.charAt(0)), 1000);
+                char[] outChar = DataManager.vectorToChar(out, vocabulary);
+                System.out.println(new String(outChar));
 
-                lstmT.assertTrue(
-                    cell1.error - oldError1 < 0,
-                    "lstm cell lowers error " + out + "%"
-                );
-
-                LstmCell cell2 = new LstmCell(vocabulary.length, vocabulary.length);
-                
-                LstmChain chain = new LstmChain(cell2);
-                chain.learn(testTestData, testExpData, 1000000, vocabulary);
-
-                // TODO assert all of these
-
-                boolean chainTesting = false; // true - the last output is fed in the input, false - the tests are fed in the input
-                String testOutput = "";
-                testOutput += (vocabulary[MathV.maxIndex(testTestData[0])]);
-                testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(testTestData[0]))]);
-                for(int i = 1; i < testTestData.length; i++){
-                    if(chainTesting)
-                        testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(chain.cell.h), chain.cell.outSize), chain.cell.h, chain.cell.c))]);
-                    else
-                        testOutput += (vocabulary[MathV.maxIndex(chain.cell.eval(testTestData[i], chain.cell.h, chain.cell.c))]);
-                }
-
-                System.out.println("'" + testOutput + "'");
-
-                lstmT.assertTrue(
-                    testOutput.equals(testData), 
-                    "lstm network learned the sentence"
-                );
-                
-                
 
             lstmT.printResult();
             mainT.assertTrue(lstmT.result(), "LSTM tests");

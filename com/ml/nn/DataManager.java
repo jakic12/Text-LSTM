@@ -28,18 +28,48 @@ public class DataManager{
     }
 
     /**
+     * the same as {@link #stringToInCharExpChar(String)}, but for an array of Strings
+     * @param x the sentences
+     * @return 2 char arrays that include 1) input datasets 2) expected output datasets
+     */
+    public static char[][][] stringToInCharExpChar(String[] x) {
+        char[][][] out = new char[2][x.length][];
+        for(int i = 0; i < x.length; i++){
+            char[][] temp = stringToInCharExpChar(x[i]);
+            out[0][i] = temp[0];
+            out[1][i] = temp[1];
+        }
+        return out;
+    }
+
+    /**
      * vectorifies the char
      * 
      * @param vocab the vocabulary
-     * @param data the chars to be represented as array
+     * @param data  the chars to be represented as array
      * @return the vector that shows the position of the char in the array
      */
+    public static double[] vectorifyChar(char[] vocab, char data) {
+        return MathV.vectorifyIndex(MathV.indexOf(vocab, data), vocab.length);
+    }
+
+    
     public static double[][] vectorifyChar(char[] vocab, char[] data){
         double[][] out = new double[data.length][];
 
         for(int i = 0; i < data.length; i++){
-            out[i] = MathV.vectorifyIndex(MathV.indexOf(vocab, data[i]), vocab.length);
+            out[i] = vectorifyChar(vocab, data[i]);
         }
+        return out;
+    }
+    
+    public static double[][][] vectorifyChar(char[] vocab, char[][] data) {
+        double[][][] out = new double[data.length][][];
+
+        for(int i = 0; i < data.length; i++){
+            out[i] = vectorifyChar(vocab, data[i]);
+        }
+        
         return out;
     }
 
@@ -68,6 +98,31 @@ public class DataManager{
     public static char[] buildCharVocab(String x){
         char[] out = getUniqueChars(x);
         return MathV.sortArray(out);
+    }
+
+    /**
+     * lstm ouput vector to char
+     * @param arr the output
+     * @param vocab the vocabulary
+     * @return the char that the vector represents
+     */
+    public static char vectorToChar(double[] arr, char[] vocab){
+        return vocab[MathV.maxIndex(arr)];
+    }
+
+    /**
+     * lstm ouputs vector to char array
+     * 
+     * @param arr the outputs
+     * @param vocab the vocabulary
+     * @return the chars that the vector represents
+     */
+    public static char[] vectorToChar(double[][] arr, char[] vocab) {
+        char[] out = new char[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            out[i] = vectorToChar(arr[i], vocab);
+        }
+        return out;
     }
 
 

@@ -1,6 +1,8 @@
 package com.ml.nn;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import com.ml.gui.Graph;
 import com.ml.math.MathV;
@@ -18,11 +20,11 @@ public class LstmChain{
 
     public LstmCell cell;
 
-    public boolean graphProgress = true;
+    public boolean graphProgress = false;
     public boolean graphAll = false;
 
-    public double lowerLearningRateRate = 0.001-0.0000001; // how much to lower the learning rate every numOfEpochsToLower epochs
-    public int numOfEpochsToLower = 1000000/2;
+    public double lowerLearningRateRate = 0; // how much to lower the learning rate every numOfEpochsToLower epochs
+    public int numOfEpochsToLower = 1;
 
     Graph[] gT;
 
@@ -124,65 +126,84 @@ public class LstmChain{
         cell.ct_1 = neurons[2][0][0];
         cell.calcNeurons();
     }
-
-    public void learn(double[][] testData, double[][] expData, int epochs,/* test */char[] vocab){
+    /**
+     * learns the data: it forward propagates all the test data and backpropagates it "epoch" times
+     * 
+     * @param testData the input data trough time
+     * @param expData the expected output trough time
+     * @param epochs the number of times to iterate trough data
+     * @return average error
+     */
+    private double learn(double[][] testData, double[][] expData, int epochs){
         this.c = new double[testData.length][expData[0].length];
         this.h = new double[testData.length][expData[0].length];
         this.dc = new double[testData.length][expData[0].length - 1];
         this.dh = new double[testData.length][expData[0].length - 1];
         this.cellNeurons = new double[testData.length][][][][][][];
-
-        Graph g = null;
-        if (this.graphProgress) {
-            g = new Graph();
-            g.showGraph("lstm chain error");
-            if(this.graphAll){
-                gT = new Graph[testData.length];
-                for (int i = 0; i < testData.length; i++) {
-                    gT[i] = new Graph();
-                    gT[i].showGraph("test " + i);
-                }    
-            }
-        }
+        double error = 0;
 
         for(int epoch = 0; epoch < epochs; epoch++){
-            double startTime = System.currentTimeMillis();
-
-            double error = forward(testData, expData);
-            System.out.println(error);
-            g.addData(error);
+            error += forward(testData, expData);
             backpropagate(testData, expData);
 
             if(epoch % numOfEpochsToLower == 0){
                 this.cell.incrementAllSetting(8, -lowerLearningRateRate);
             }
-
-            // test
-            boolean testPrev = true;
-            String testOutput = "";
-            testOutput += (vocab[MathV.maxIndex(testData[0])]);
-            testOutput += (vocab[MathV.maxIndex(this.cell.eval(testData[0]))]);
-            for(int i = 1; i < testData.length; i++){
-                if(testPrev)
-                    testOutput += (vocab[MathV.maxIndex(this.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(this.cell.h), this.cell.outSize), this.cell.h, this.cell.c))]);
-                else
-                    testOutput += (vocab[MathV.maxIndex(this.cell.eval(testData[i], this.cell.h, this.cell.c))]);
-            }
-
-            double endTime = System.currentTimeMillis();
-            double duration = (endTime - startTime)/1000.0;
-
-            System.out.println("'" + testOutput + "'");
-            System.out.println("remaining: " + (duration*(epochs-epoch)) + "seconds");
-            // test
         }
+        return error/epochs;
+    }
 
+    /**
+     * learns multiple datasets
+     * same as {@link #learn(double[][], double[][], int)}, but for multiple datasets
+     * 
+     * @param testData all the datasets (testData[0] -> data trough time)
+     * @param expData the expected data
+     * @param epochs number of times to repeat the process
+     * @param iterations number of times to go trough each dataset
+     */
+    public void learn(double[][][] testData, double[][][] expData, int epochs, int iterations){
+        Graph g = null;
+        if (this.graphProgress) {
+            g = new Graph();
+            g.showGraph("lstm chain error");
+            if (this.graphAll) {
+                gT = new Graph[testData.length];
+                for (int i = 0; i < testData.length; i++) {
+                    gT[i] = new Graph();
+                    gT[i].showGraph("test " + i);
+                }
+            }
+        }
+        for(int epoch = 0; epoch < epochs; epoch++){
+            
+            double startTime = System.currentTimeMillis();//timer
+
+            //the learning part
+            double error = 0;
+            for (int i = 0; i < testData.length; i++) {
+                error += learn(testData[i], expData[i], iterations);
+            }
+            error /= testData.length;
+
+            //visualization
+            System.out.println(error);
+            if(g != null)
+                g.addData(error);
+
+            // timer
+            double endTime = System.currentTimeMillis();
+            double duration = (endTime - startTime) / 1000.0;
+
+            System.out.println(epoch + "e - remaining: " + new SimpleDateFormat("HH:mm:ss").format(new Date(0,0,0,0,0,(int)(duration * (epochs - epoch)))));
+            
+        }
         System.out.println("end");
     }
 
 
     /**
-     * Function that accepts input and expected output, so it can calculate the error
+     * forwards all the test data and calculate the average error
      * 
      * @param testData array of inputs
      * @param expData array of expected outputs
@@ -208,6 +229,42 @@ public class LstmChain{
         }
 
         return sumError/testData.length;
+    }
+
+    /**
+     * forwards the starting data first and then forwards the output of t-1,
+     * n-1 times
+     * @param start the first input
+     * @param count how many times to forward
+     * @return the array of all of the outputs trough time
+     */
+    public double[][] forward(double[] start, int count){
+        double[][] out = new double[count][];
+        out[0] = this.cell.eval(start);
+        for(int i = 1; i < count; i++){
+            out[i] = this.cell.eval(this.cell.h, this.cell.h, this.cell.c);
+        }
+        return out;
+    }
+
+    /**
+     * same as {@link #forward(double[], int)}, but cleans up output before feeding it forward<br>
+     * <pre>
+     * example:
+     *  before clean up:
+     *      [0.213123,0.243234,0.92123123,0.0210239]
+     *  after clean up:
+     *      [0,0,1,0]
+     * </pre>
+     * @see #forward(double[], int)
+     */
+    public double[][] forwardWithVectorify(double[] start, int count) {
+        double[][] out = new double[count][];
+        out[0] = this.cell.eval(start);
+        for (int i = 1; i < count; i++) {
+            out[i] = this.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(this.cell.h), this.cell.outSize), this.cell.h, this.cell.c);
+        }
+        return out;
     }
 
     public void backpropagate(double[][] testData, double[][] expData){

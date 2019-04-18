@@ -9,7 +9,7 @@ import com.ml.nn.Mlp;
 public class LstmCell {
 
     // settings
-    public double learningRate = 0.001;
+    public double learningRate = 0.00001;
     public String errorFunction = "meanSquared";
     public String gateMode = "double"; // double - one mlp for x, single mlp for h
     
@@ -35,7 +35,6 @@ public class LstmCell {
     public LstmCell(int inputSize, int outputSize){
         this.inSize = inputSize;
         this.outSize = outputSize;
-        int combinedSize = inputSize + outputSize;
 
         this.mlpDimensions = new int[] { inputSize, outputSize };
 

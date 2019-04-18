@@ -65,6 +65,8 @@ public class MathV{
                 for(int i = 0; i < b[0].length; i++){
                     for(int j = 0; j < a[0].length; j++){
                         out[v][i] += a[v][j] * b[j][i];
+                        if (out[v][i] == Double.NaN)
+                            throw new RuntimeException("nan at dot");
                     }
                 }
 
@@ -83,6 +85,8 @@ public class MathV{
             for (int i = 0; i < b[0].length; i++) {
                 for (int j = 0; j < a.length; j++) {
                     out[i] += a[j] * b[j][i];
+                    if(out[i] == Double.NaN)
+                        throw new RuntimeException("nan at dot");
                 }
             }
         }
