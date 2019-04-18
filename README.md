@@ -88,7 +88,7 @@ inputs   outputs
 testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 1000, 100);
 ```
 
-# Graph -> GraphingTool
+# Graph
 
 This is a graphing library which is kinda bad.
 
@@ -120,3 +120,69 @@ or as a value
 testGraph.addData(10);
 ```
 or as an array of any of the two
+
+# DataManager
+DataManager is made, to convert from meaningfull data, to Lstm trainable data
+
+## Example usage
+### text
+##### build a vocabulary
+```java
+char[] vocabulary = DataManager.buildCharVocab("test sentence1. Test sentence2");
+```
+
+##### convert a sentence to lstm data
+```java
+//TODO check if posible
+```
+
+##### convert multiple sentences to lstm data
+```java
+String[] testData = new String[]{"test sentence1", "Test sentence2"};
+char[][][] data = DataManager.stringToInCharExpChar(testData);
+char[] vocabulary = DataManager.buildCharVocab("test sentence1. Test sentence2");
+
+double[][][] testTestData = DataManager.vectorifyChar(vocabulary, data[0]);
+double[][][] testExpData = DataManager.vectorifyChar(vocabulary, data[1]);
+```
+
+##### convert vectorized sentence to chars
+```java
+char[] outChar = DataManager.vectorToChar(out, vocabulary);
+```
+
+# LstmCell
+This object is an abstract lstm cell with 4 gates
+
+## Example usage
+
+##### Create new cell
+```java
+int inputSize = 2;
+int outputSize = 3;
+LstmCell cell1 = new LstmCell(inputSize, outputSize);
+```
+
+# LstmChain
+Made for orchestraiting and training an lstmcell
+
+## Example usage
+##### create new chain
+```java
+LstmChain chain = new LstmChain(cell1);
+```
+
+##### Make the cell learn on some data on 10000 epochs and 100 iterations
+```java
+// example data [0,0,1] -> [0,1,0]
+//              [0,1,0] -> [1,0,0]
+double[][] testTestData = new double[][]{{0,0,1},{0,1,0}};
+double[][] testExpData = new double[][]{{0,1,0},{1,0,0}};
+
+chain.learn(testTestData, testExpData, 10000, 100);
+```
+
+##### Generate 1000 sets of data, with the first data being [0,0,1]
+```java
+double[][] out = chain.forwardWithVectorify([0,0,1], 1000);
+```
