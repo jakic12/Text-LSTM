@@ -8,6 +8,8 @@ import com.ml.gui.Graph;
 import com.ml.math.MathV;
 import com.ml.nn.LstmCell;
 
+import com.ml.other.*;
+
 public class LstmChain{
 
     double[][] c;
@@ -22,9 +24,12 @@ public class LstmChain{
 
     public boolean graphProgress = false;
     public boolean graphAll = false;
+    public boolean printProgresss = false;
 
     public double lowerLearningRateRate = 0; // how much to lower the learning rate every numOfEpochsToLower epochs
     public int numOfEpochsToLower = 1;
+    
+    private ProgressHandler handler = null;
 
     Graph[] gT;
 
@@ -145,7 +150,7 @@ public class LstmChain{
         for(int epoch = 0; epoch < epochs; epoch++){
             error += forward(testData, expData);
             backpropagate(testData, expData);
-
+            
             if(epoch % numOfEpochsToLower == 0){
                 this.cell.incrementAllSetting(8, -lowerLearningRateRate);
             }
@@ -176,8 +181,9 @@ public class LstmChain{
             }
         }
         for(int epoch = 0; epoch < epochs; epoch++){
-            
-            double startTime = System.currentTimeMillis();//timer
+            double startTime = 0;
+            if(this.printProgresss)
+                startTime = System.currentTimeMillis();//timer
 
             //the learning part
             double error = 0;
@@ -187,18 +193,27 @@ public class LstmChain{
             error /= testData.length;
 
             //visualization
-            System.out.println(error);
+            if(this.printProgresss)
+                System.out.println(error);
             if(g != null)
                 g.addData(error);
 
             // timer
-            double endTime = System.currentTimeMillis();
-            double duration = (endTime - startTime) / 1000.0;
+            if(this.printProgresss){
+                double endTime = System.currentTimeMillis();
+                double duration = (endTime - startTime) / 1000.0;
 
-            System.out.println(epoch + "e - remaining: " + new SimpleDateFormat("HH:mm:ss").format(new Date(0,0,0,0,0,(int)(duration * (epochs - epoch)))));
-            
+                System.out.println(epoch + "e - remaining: " + new SimpleDateFormat("HH:mm:ss").format(new Date(0,0,0,0,0,(int)(duration * (epochs - epoch)))));
+            }
+
+            //handler
+            if(this.handler != null){
+                this.handler.progress(((double)epoch/epochs)*100);
+            }
+
         }
-        System.out.println("end");
+        if(this.printProgresss)
+            System.out.println("end");
     }
 
 
@@ -290,5 +305,21 @@ public class LstmChain{
                 this.dh[t-1] = timeCell.dht_1;
             }
         }
+    }
+    
+    /**
+     * sets up the handler that gets called every epoch<br>
+     * 
+     * <pre>
+     * chain.onProgress(new ProgressHandler(){
+     *  //code to be executed
+     * });
+     * </pre>
+     * 
+     * @param handler the handler to be called on progress
+     * @see ProgressHandler
+     */
+    public void onProgress(ProgressHandler handler){
+        this.handler = handler;
     }
 }

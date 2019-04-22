@@ -8,6 +8,10 @@ import java.io.PrintWriter;
 import com.ml.math.*;
 import com.ml.gui.*;
 
+/**
+ * Multilayered perceptron class, which creates a feedforward network with specified dimentions.
+ * it can forwardpropagate, backpropagate, learn on data
+ */
 public class Mlp{
 
     double[] settings = {

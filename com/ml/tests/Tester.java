@@ -1,4 +1,4 @@
-package com.ml.other;
+package com.ml.tests;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -7,10 +7,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import com.ml.math.*;
 import com.ml.nn.Mlp;
-import com.ml.nn.DataManager;
+import com.ml.other.ProgressHandler;
+import com.ml.data.DataManager;
+import com.ml.nn.LstmBlock;
 import com.ml.nn.LstmCell;
 import com.ml.nn.LstmChain;
-import com.ml.gui.*;
 
 public class Tester{
     public static void main(String[] args){
@@ -219,6 +220,7 @@ public class Tester{
 
                 testMlp.setSetting(9, 0);
                 testMlp.setSetting(8, 1);
+                testMlp.setSetting(11, 0);
 
                 testMlp.forward(new double[]{1,0,1},new double[]{0.846423, 0.846423, 0.846423});//not sure how to test error
 
@@ -247,7 +249,7 @@ public class Tester{
                 Mlp testMlp1 = new Mlp(new int[]{2,2,1});
                 testMlp1.setSetting(3, 0);
                 testMlp1.setSetting(8, 0.01);
-                testMlp1.setSetting(11,1);
+                testMlp1.setSetting(11,0);
                 testMlp1.randomlySetWeights();
                 testMlp1.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 100000, 10);
 
@@ -265,7 +267,7 @@ public class Tester{
                 testMlp2.setSetting(3, 0);
                 testMlp2.setSetting(8, 0.01);
                 testMlp2.setSetting(6, 2);
-                testMlp2.setSetting(11,1);
+                testMlp2.setSetting(11,0);
                 testMlp2.randomlySetWeights();
                 testMlp2.learn(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}}, new double[][]{{0}, {1}, {1}, {0}}, 100000, 10);
 
@@ -292,6 +294,12 @@ public class Tester{
                 );
 
                 DataManagerT.assertEqual(
+                    DataManager.stringToInCharExpChar(new String[]{"test", "test2"}),
+                    new char[][][]{{{'t','e','s'},{'t','e','s','t'}}, {{'e','s','t'},{'e','s','t','2'}}},
+                    "stringToInCharExpChar array"
+                );
+
+                DataManagerT.assertEqual(
                     DataManager.vectorifyChar(new char[]{'t', 'e', 's'}, "test"),
                     new double[][]{{1,0,0}, {0,1,0}, {0,0,1}, {1,0,0}},
                     "vectorify char ( single array )"
@@ -305,7 +313,7 @@ public class Tester{
 
             DataManagerT.printResult();
             mainT.assertTrue(DataManagerT.result(), "DataManager tests");
-            */
+            
             
             Tester lstmT = new Tester("LSTM");
 
@@ -337,21 +345,15 @@ public class Tester{
 
                 LstmChain testChain2 = new LstmChain(msWordTestCell);
 
-                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);*/
+                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);//////////////
 
                 // the test sentences - unsplit
-                String testSentences = null;
-
-				try {
-					testSentences = new String(Files.readAllBytes(Paths.get("testData/lstm_greek")) ,StandardCharsets.UTF_8);
-				} catch (IOException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-				}
+                String testSentences = "test1,,reee";
+                testSentences.replace(",,", "");
                 String[] testData = testSentences.split(",,");
                 /*for(int i = 0; i < testData.length-1; i++){
                     testData[i] += " ";
-                }*/
+                }//////////////
 
                 //build vocabulary and change the chars to input output pairs
                 char[][][] data = DataManager.stringToInCharExpChar(testData);
@@ -362,20 +364,51 @@ public class Tester{
                 double[][][] testExpData = DataManager.vectorifyChar(vocabulary, data[1]);
 
                 //create lstm cell and chain
-                LstmCell cell1 = new LstmCell(vocabulary.length, vocabulary.length);
+                LstmCell cell1 = new LstmCell(vocabulary.length, vocabulary.length, 0.001);
                 LstmChain chain = new LstmChain(cell1);
 
+                chain.onProgress(new ProgressHandler(){
+                    @Override
+                    public void progress(double progress){
+                        //System.out.println(progress);
+                    }
+                });
+
                 //learn the data
-                chain.learn(testTestData, testExpData, 10000, 50);
+                chain.learn(testTestData, testExpData, 1000, 50);
+                
+                chain.printProgresss = false;
 
                 //generate sentences
-                double[][] out = chain.forwardWithVectorify(DataManager.vectorifyChar(vocabulary, testSentences.charAt(0)), 1000);
-                char[] outChar = DataManager.vectorToChar(out, vocabulary);
-                System.out.println(new String(outChar));
-
-
+                for(int i = 0; i < testData.length; i++){
+                    double[][] out = chain.forwardWithVectorify(DataManager.vectorifyChar(vocabulary, testData[i].charAt(0)), testData[i].length()-1);
+                    char[] outChar = DataManager.vectorToChar(out, vocabulary);
+                    String outStr = testData[i].charAt(0) + new String(outChar);
+                    //System.out.println(outStr);
+                    lstmT.assertEqual(
+                        outStr, 
+                        testData[i], 
+                        "learned sentence:'" + testData[i] + "'"
+                    );
+                }
             lstmT.printResult();
             mainT.assertTrue(lstmT.result(), "LSTM tests");
+            */
+
+            Tester lstmBlockT = new Tester("LSTM block");
+                String sentence = "test";
+                LstmBlock block = new LstmBlock(sentence, 0.001);
+                block.train(1000, 50);
+
+                lstmBlockT.assertEqual(
+                    sentence, 
+                    block.forward('t', sentence.length()-1), 
+                    "lstm block can learn '" + sentence + "'"
+                );
+
+            lstmBlockT.printResult();
+            mainT.assertTrue(lstmBlockT.result(), "LSTM block tests");
+
             
 
         mainT.printResult();
@@ -408,6 +441,10 @@ public class Tester{
     public void assertEqual(double a, double b, String testName){
         this.debugString = a + "";
         assertTrue(a == b, testName);
+    }
+
+    public void assertEqual(String a, String b, String testName){
+        assertTrue(a.equals(b), testName);
     }
 
     public void assertEqual(double[] a, double[] b, String testName){
@@ -470,6 +507,26 @@ public class Tester{
                     if (a[i][j] != b[i][j]) {
                         pass = false;
                         break;
+                    }
+                }
+            }
+        } else {
+            pass = false;
+        }
+
+        assertTrue(pass, testName);
+    }
+
+    public void assertEqual(char[][][] a, char[][][] b, String testName) {
+        boolean pass = true;
+        if (a.length == b.length && a[0].length == b[0].length) {
+            for (int i = 0; i < a.length; i++) {
+                for (int j = 0; j < a[i].length; j++) {
+                    for(int x = 0; x < a[i][j].length; x++){
+                        if (a[i][j][x] != b[i][j][x]) {
+                            pass = false;
+                            break;
+                        }
                     }
                 }
             }

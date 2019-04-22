@@ -1,4 +1,4 @@
-package com.ml.nn;
+package com.ml.data;
 
 import com.ml.math.*;
 

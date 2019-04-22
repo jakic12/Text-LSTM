@@ -31,8 +31,10 @@ public class LstmCell {
 
     public int[] mlpDimensions;
     public int[] mlpDimensionsH; // dimentions for the X network if gate mode is double
-
-    public LstmCell(int inputSize, int outputSize){
+    
+    public LstmCell(int inputSize, int outputSize, double learningRate) {
+        if(learningRate != 0)
+            this.learningRate = learningRate;
         this.inSize = inputSize;
         this.outSize = outputSize;
 
