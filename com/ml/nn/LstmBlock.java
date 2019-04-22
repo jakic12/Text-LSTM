@@ -2,6 +2,7 @@ package com.ml.nn;
 
 import com.ml.data.DataManager;
 import com.ml.math.*;
+import com.ml.other.ProgressHandler;
 
 /**
  * abstaction for binding an lstmchain with its dataset, for easier usage (no
@@ -29,6 +30,10 @@ public class LstmBlock{
 
         this.chain = new LstmChain(new LstmCell(this.vocabulary.length, this.vocabulary.length, learningRate));
         //this.chain.printProgresss = true;
+    }
+
+    public void onProgress(ProgressHandler handler) {
+        this.chain.onProgress(handler);
     }
 
     /**
