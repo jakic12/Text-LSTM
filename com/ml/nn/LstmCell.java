@@ -1,12 +1,14 @@
 package com.ml.nn;
 
+import java.io.Serializable;
+
 import javax.management.RuntimeErrorException;
 
 import com.ml.gui.*;
 import com.ml.math.MathV;
 import com.ml.nn.Mlp;
 
-public class LstmCell {
+public class LstmCell implements Serializable{
 
     // settings
     public double learningRate = 0.00001;

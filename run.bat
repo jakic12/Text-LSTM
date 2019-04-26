@@ -1,1 +1,1 @@
-javac com/ml/other/Tester.java && java com.ml.other.Tester
+javac com/ml/tests/Tester.java && java com.ml.other.Tester

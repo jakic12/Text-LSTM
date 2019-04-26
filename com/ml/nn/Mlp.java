@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 
 import com.ml.math.*;
 import com.ml.gui.*;
@@ -12,7 +13,7 @@ import com.ml.gui.*;
  * Multilayered perceptron class, which creates a feedforward network with specified dimentions.
  * it can forwardpropagate, backpropagate, learn on data
  */
-public class Mlp{
+public class Mlp implements Serializable{
 
     double[] settings = {
         1, // activate weights with random value  0

@@ -1,0 +1,1 @@
+javac com/ml/tests/Tester.java && jar cf machineLearning.jar com

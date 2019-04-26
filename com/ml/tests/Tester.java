@@ -1,6 +1,10 @@
 package com.ml.tests;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -345,7 +349,7 @@ public class Tester{
 
                 LstmChain testChain2 = new LstmChain(msWordTestCell);
 
-                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);//////////////
+                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);/////////////////
 
                 // the test sentences - unsplit
                 String testSentences = "test1,,reee";
@@ -353,7 +357,7 @@ public class Tester{
                 String[] testData = testSentences.split(",,");
                 /*for(int i = 0; i < testData.length-1; i++){
                     testData[i] += " ";
-                }//////////////
+                }/////////////////
 
                 //build vocabulary and change the chars to input output pairs
                 char[][][] data = DataManager.stringToInCharExpChar(testData);
@@ -369,8 +373,13 @@ public class Tester{
 
                 chain.onProgress(new ProgressHandler(){
                     @Override
-                    public void progress(double progress){
+                    public void progress(int epoch, double error){
                         //System.out.println(progress);
+                    }
+
+                    @Override
+                    public void end(double error) {
+                    
                     }
                 });
 
@@ -392,19 +401,48 @@ public class Tester{
                     );
                 }
             lstmT.printResult();
-            mainT.assertTrue(lstmT.result(), "LSTM tests");
-            */
+            mainT.assertTrue(lstmT.result(), "LSTM tests");*/
+            
 
             Tester lstmBlockT = new Tester("LSTM block");
                 String sentence = "test";
                 LstmBlock block = new LstmBlock(sentence, 0.001);
                 block.train(1000, 50);
+                String testForward1 = block.forward('t', sentence.length()-1);
 
                 lstmBlockT.assertEqual(
                     sentence, 
-                    block.forward('t', sentence.length()-1), 
+                    testForward1, 
                     "lstm block can learn '" + sentence + "'"
                 );
+
+                String afterSave = "";
+
+                try {
+                    ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("testFile.net"));
+                    os.writeObject(block);
+                    os.close();
+
+
+                    ObjectInputStream is = new ObjectInputStream(new FileInputStream("testFile.net"));
+                    LstmBlock block1 = (LstmBlock)is.readObject();
+                    afterSave = block1.forward('t', sentence.length()-1);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                lstmBlockT.assertEqual(
+                    testForward1, 
+                    afterSave, 
+                    "lstm block forwards the same after saving and oppening it again"
+                );
+
+
 
             lstmBlockT.printResult();
             mainT.assertTrue(lstmBlockT.result(), "LSTM block tests");

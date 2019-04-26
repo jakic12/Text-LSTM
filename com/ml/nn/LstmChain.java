@@ -1,5 +1,6 @@
 package com.ml.nn;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,7 +11,7 @@ import com.ml.nn.LstmCell;
 
 import com.ml.other.*;
 
-public class LstmChain{
+public class LstmChain implements Serializable{
 
     double[][] c;
     double[][] h;
@@ -180,13 +181,14 @@ public class LstmChain{
                 }
             }
         }
+        double error = -1;
         for(int epoch = 0; epoch < epochs; epoch++){
             double startTime = 0;
             if(this.printProgresss)
                 startTime = System.currentTimeMillis();//timer
 
             //the learning part
-            double error = 0;
+            error = 0;
             for (int i = 0; i < testData.length; i++) {
                 error += learn(testData[i], expData[i], iterations);
             }
@@ -206,14 +208,20 @@ public class LstmChain{
                 System.out.println(epoch + "e - remaining: " + new SimpleDateFormat("HH:mm:ss").format(new Date(0,0,0,0,0,(int)(duration * (epochs - epoch)))));
             }
 
-            //handler
+            //handler progress
             if(this.handler != null){
-                this.handler.progress(((double)epoch/epochs)*100);
+                this.handler.progress(epoch, error);
             }
 
         }
         if(this.printProgresss)
             System.out.println("end");
+
+        // handler end
+        if (this.handler != null) {
+            this.handler.progress(epochs, error);
+            this.handler.end(error);
+        }
     }
 
 
