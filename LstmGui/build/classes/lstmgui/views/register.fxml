@@ -7,7 +7,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="864.0" prefWidth="1448.0" style="-fx-background-color: #2b2b2b;" xmlns="http://javafx.com/javafx/8.0.191" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lstmgui.controllers.registerController">
    <children>
-      <Button layoutX="1422.0" layoutY="2.0" mnemonicParsing="false" onAction="#closeButtonClicked" style="-fx-background-color: #2b2b2b;" text="X" textFill="WHITE" />
+      <Button layoutX="1381.0" layoutY="2.0" mnemonicParsing="false" onAction="#closeButtonClicked" prefHeight="55.0" prefWidth="65.0" style="-fx-background-color: #2b2b2b;" text="X" textFill="WHITE" />
       <TextField fx:id="usernameField" layoutX="570.0" layoutY="289.0" prefHeight="34.0" prefWidth="308.0" promptText="username" style="-fx-background-color: #3f3f3f; -fx-text-fill: white;" />
       <PasswordField fx:id="passwordField" layoutX="570.0" layoutY="351.0" prefHeight="34.0" prefWidth="308.0" promptText="password" style="-fx-background-color: #3f3f3f; -fx-text-fill: white;" />
       <Button layoutX="798.0" layoutY="479.0" mnemonicParsing="false" onAction="#registerButtonClicked" prefHeight="34.0" prefWidth="80.0" style="-fx-background-color: #66bb6a;" text="register" textFill="WHITE" />

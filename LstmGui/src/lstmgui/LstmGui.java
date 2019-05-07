@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import com.ml.nn.LstmBlock;
+import lstmgui.model.stateManager;
 
 
 /**
@@ -31,7 +32,7 @@ public class LstmGui extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
-        Parent root = FXMLLoader.load(getClass().getResource("/lstmgui/views/register.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/lstmgui/views/login.fxml"));
         stage.initStyle(StageStyle.UNDECORATED);
         
         windowMovement(root, stage);
@@ -40,6 +41,7 @@ public class LstmGui extends Application {
                 
         stage.setScene(scene);
         stage.show();
+        stateManager.stage = stage;
     }
 
     /**

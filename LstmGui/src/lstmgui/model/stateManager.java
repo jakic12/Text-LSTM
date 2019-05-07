@@ -15,18 +15,25 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import lstmgui.SwitcherController;
 /**
  * this class was made to manage the static state
  * @author jakob
  */
 public class stateManager {
+    public static Stage stage;
     private static ArrayList<LstmBlock> blocks = new ArrayList<LstmBlock>();
     private static String networkFilesLocation = "network_files/";
     public static SwitcherController switcher = null;
@@ -41,6 +48,21 @@ public class stateManager {
         if(learningThread != null)
             return learningThread.isAlive();
         return false;
+    }
+    /**
+     * change stage to fxml view
+     */
+    public static void changeFile(URL location){
+        Parent root;
+        try {
+            root = FXMLLoader.load(location);
+            Scene scene = new Scene(root);      
+            stage.setScene(scene);
+            stage.show();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(stateManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public static void addBlock(LstmBlock block){
