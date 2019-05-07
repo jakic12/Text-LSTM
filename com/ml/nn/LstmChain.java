@@ -34,6 +34,8 @@ public class LstmChain implements Serializable{
 
     Graph[] gT;
 
+    public volatile boolean stopLearning = false;
+
     public LstmChain(LstmCell cell){
         this.cell = cell;
     }
@@ -141,6 +143,7 @@ public class LstmChain implements Serializable{
      * @return average error
      */
     private double learn(double[][] testData, double[][] expData, int epochs){
+        this.stopLearning = false;
         this.c = new double[testData.length][expData[0].length];
         this.h = new double[testData.length][expData[0].length];
         this.dc = new double[testData.length][expData[0].length - 1];
@@ -149,11 +152,16 @@ public class LstmChain implements Serializable{
         double error = 0;
 
         for(int epoch = 0; epoch < epochs; epoch++){
+            if (this.stopLearning)
+                break;
+
+            System.out.println(this.stopLearning);
+
             error += forward(testData, expData);
             backpropagate(testData, expData);
             
             if(epoch % numOfEpochsToLower == 0){
-                this.cell.incrementAllSetting(8, -lowerLearningRateRate);
+                this.cell.setLearningRate(this.cell.learningRate - lowerLearningRateRate);
             }
         }
         return error/epochs;
@@ -169,6 +177,7 @@ public class LstmChain implements Serializable{
      * @param iterations number of times to go trough each dataset
      */
     public void learn(double[][][] testData, double[][][] expData, int epochs, int iterations){
+        this.stopLearning = false;
         Graph g = null;
         if (this.graphProgress) {
             g = new Graph();
@@ -186,6 +195,9 @@ public class LstmChain implements Serializable{
             double startTime = 0;
             if(this.printProgresss)
                 startTime = System.currentTimeMillis();//timer
+            
+            if (this.stopLearning)
+                break;
 
             //the learning part
             error = 0;
@@ -329,5 +341,9 @@ public class LstmChain implements Serializable{
      */
     public void onProgress(ProgressHandler handler){
         this.handler = handler;
+    }
+
+    public ProgressHandler getHandler(){
+        return this.handler;
     }
 }

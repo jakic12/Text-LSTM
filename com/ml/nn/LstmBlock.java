@@ -1,6 +1,8 @@
 package com.ml.nn;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.ml.data.DataManager;
 import com.ml.math.*;
@@ -16,6 +18,7 @@ public class LstmBlock implements Serializable{
     public char[] vocabulary;
     public LstmChain chain;
     public String name;
+    public String delimiter;
 
     private String type;
 
@@ -37,8 +40,18 @@ public class LstmBlock implements Serializable{
 
     public LstmBlock(String training_sentences, String delimiter, double learningRate) {
         this.type = "text";
+        this.delimiter = delimiter;
 
-        char[][][] data = DataManager.stringToInCharExpChar(training_sentences.split(delimiter));
+        // get only valid training sentences ( those that are not empty)
+        String[] training_sentences_arr = training_sentences.split(delimiter);
+        ArrayList<String> valid_sentences = new ArrayList<String>();
+        for(int i = 0; i < training_sentences_arr.length; i++){
+            if(training_sentences_arr[i].length() > 1){
+                valid_sentences.add(training_sentences_arr[i]);
+            }
+        }
+        Object[] valid_sentences_arr = valid_sentences.toArray();
+        char[][][] data = DataManager.stringToInCharExpChar(Arrays.copyOf(valid_sentences_arr, valid_sentences_arr.length, String[].class));
         this.vocabulary = DataManager.buildCharVocab(training_sentences);
 
         double[][][] testData = DataManager.vectorifyChar(vocabulary, data[0]);
@@ -63,16 +76,47 @@ public class LstmBlock implements Serializable{
      */
     public void train(int epochs, int iterations){
         try{
-            this.chain.learn((double[][][])trainingData, (double[][][])expTrainingData, epochs, iterations);
+            this.chain.learn((double[][][]) this.trainingData, (double[][][]) this.expTrainingData, epochs, iterations);
         }catch(ClassCastException e){
             System.out.println(e);
             try {
                 this.chain.learn(new double[][][]{(double[][]) trainingData}, new double[][][]{(double[][]) expTrainingData}, epochs, iterations);
             } catch (ClassCastException e1) {
                 System.out.println(e1);
+                e1.printStackTrace();
             }
         }
         //System.out.println("training complete!");
+    }
+
+    public String getStringData(){
+        String out = "";
+        try {
+            char[][] charArr = DataManager.vectorToChar((double[][][])this.trainingData, this.vocabulary);
+            char[][] expArr = DataManager.vectorToChar((double[][][]) this.expTrainingData, this.vocabulary);
+
+            for(int i = 0; i < charArr.length; i++){
+                out += new String(charArr[i]);
+                out += expArr[i][expArr[i].length - 1];
+                out += this.delimiter;
+            }
+            
+        } catch (ClassCastException e) {
+            System.out.println(e);
+            try {
+                out = new String(DataManager.vectorToChar((double[][]) this.trainingData, this.vocabulary));
+                char[] expArr = DataManager.vectorToChar((double[][]) this.expTrainingData, this.vocabulary);
+
+                out += expArr[expArr.length-1];
+
+            } catch (ClassCastException e1) {
+                System.out.println(e1);
+                e1.printStackTrace();
+            }
+        } finally {
+            return out;
+        }
+
     }
 
     /**
@@ -101,5 +145,9 @@ public class LstmBlock implements Serializable{
         } else {
             throw new RuntimeException("can not forward a char if the network isnt a text network");
         }
+    }
+
+    public void stopLearning(){
+        this.chain.stopLearning = true;
     }
 }

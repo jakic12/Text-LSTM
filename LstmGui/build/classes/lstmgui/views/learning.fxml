@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane id="AnchorPane" prefHeight="834.0" prefWidth="1198.0" stylesheets="@../css/learning.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lstmgui.controllers.LearningController">
+   <children>
+      <AnchorPane layoutX="904.0" layoutY="12.0" prefHeight="805.0" prefWidth="280.0" styleClass="floating-box">
+         <children>
+            <TextField fx:id="learningRateField" layoutX="96.0" layoutY="65.0" prefHeight="25.0" prefWidth="89.0" />
+            <Label layoutX="107.0" layoutY="43.0" text="learning rate" />
+            <TextField layoutX="77.0" layoutY="146.0" prefHeight="25.0" prefWidth="54.0" />
+            <Label layoutX="85.0" layoutY="125.0" text="learning rate decrease" />
+            <Label layoutX="141.0" layoutY="150.0" text="/" />
+            <TextField layoutX="155.0" layoutY="146.0" prefHeight="25.0" prefWidth="54.0" />
+            <Button layoutX="14.0" layoutY="766.0" mnemonicParsing="false" onAction="#changeSettings" prefHeight="25.0" prefWidth="89.0" text="set settings" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="14.0" layoutY="402.0" prefHeight="411.0" prefWidth="864.0" styleClass="floating-box">
+         <children>
+            <LineChart fx:id="errorLineChart" disable="true" layoutX="15.0" layoutY="11.0" legendVisible="false" prefHeight="509.0" prefWidth="531.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+              <xAxis>
+                <CategoryAxis label="epoch" side="BOTTOM" />
+              </xAxis>
+              <yAxis>
+                <NumberAxis label="error" side="LEFT" />
+              </yAxis>
+            </LineChart>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="14.0" layoutY="259.0" prefHeight="118.0" prefWidth="561.0" styleClass="floating-box">
+         <children>
+            <Button layoutX="452.0" layoutY="47.0" mnemonicParsing="false" onAction="#startLearning" prefHeight="52.0" prefWidth="95.0" styleClass="start-btn" text="Start Learning" AnchorPane.rightAnchor="14.0" />
+            <ProgressBar fx:id="trainingProgressBar" layoutX="14.0" layoutY="14.0" prefHeight="18.0" prefWidth="405.0" progress="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+            <Label layoutX="15.0" layoutY="59.0" text="Estimated time:" AnchorPane.bottomAnchor="14.0" AnchorPane.topAnchor="42.0" />
+            <Label layoutX="111.0" layoutY="59.0" text="time" AnchorPane.bottomAnchor="14.0" AnchorPane.topAnchor="42.0" />
+            <Label layoutX="207.0" layoutY="45.0" prefHeight="58.0" prefWidth="35.0" text="error:" AnchorPane.bottomAnchor="17.0" AnchorPane.topAnchor="45.0" />
+            <Label fx:id="errorLabel" layoutX="252.0" layoutY="44.0" prefHeight="60.0" prefWidth="82.0" AnchorPane.bottomAnchor="16.0" AnchorPane.topAnchor="44.0" />
+            <Button fx:id="stopButton" layoutX="346.0" layoutY="47.0" mnemonicParsing="false" onAction="#stopButtonAction" prefHeight="52.0" prefWidth="95.0" style="-fx-background-color: #e74c3c;" text="Stop learning" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="599.0" layoutY="14.0" prefHeight="363.0" prefWidth="280.0" styleClass="floating-box">
+         <children>
+            <ScrollPane fx:id="lstmListScroll" layoutX="14.0" layoutY="35.0" prefHeight="272.0" prefWidth="254.0" style="-fx-background-color: #fff; -fx-border-width: 0px;" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="13.0">
+              <content>
+                <AnchorPane fx:id="scrollAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="260.0">
+                     <children>
+                        <VBox fx:id="lstmList" prefHeight="200.0" prefWidth="263.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            <Button layoutX="133.0" layoutY="317.0" mnemonicParsing="false" onAction="#editLstms" prefHeight="33.0" prefWidth="135.0" style="-fx-background-color: #2693F2;" text="add / remove lstms" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="223.0" prefWidth="561.0" styleClass="floating-box" />
+   </children>
+</AnchorPane>

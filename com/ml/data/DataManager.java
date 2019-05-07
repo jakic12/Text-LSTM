@@ -125,4 +125,12 @@ public class DataManager{
         return out;
     }
 
+    public static char[][] vectorToChar(double[][][] arr, char[] vocab){
+        char[][] out = new char[arr.length][];
+        for(int i = 0; i < arr.length; i++){
+            out[i] = vectorToChar(arr[i], vocab);
+        }
+        return out;
+    }
+
 }

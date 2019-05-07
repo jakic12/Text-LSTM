@@ -20,7 +20,7 @@ import com.ml.nn.LstmChain;
 public class Tester{
     public static void main(String[] args){
         Tester mainT = new Tester("Overall");
-            /*
+            
             Tester mathT = new Tester("MathV");
 
                 mathT.assertEqual(
@@ -349,7 +349,7 @@ public class Tester{
 
                 LstmChain testChain2 = new LstmChain(msWordTestCell);
 
-                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);/////////////////
+                testChain2.learn(new double[][]{{1,2},{0.5,3}},new double[][]{{0.5},{1.25}}, 1);*/
 
                 // the test sentences - unsplit
                 String testSentences = "test1,,reee";
@@ -357,7 +357,7 @@ public class Tester{
                 String[] testData = testSentences.split(",,");
                 /*for(int i = 0; i < testData.length-1; i++){
                     testData[i] += " ";
-                }/////////////////
+                }*/
 
                 //build vocabulary and change the chars to input output pairs
                 char[][][] data = DataManager.stringToInCharExpChar(testData);
@@ -401,7 +401,7 @@ public class Tester{
                     );
                 }
             lstmT.printResult();
-            mainT.assertTrue(lstmT.result(), "LSTM tests");*/
+            mainT.assertTrue(lstmT.result(), "LSTM tests");
             
 
             Tester lstmBlockT = new Tester("LSTM block");
@@ -441,8 +441,6 @@ public class Tester{
                     afterSave, 
                     "lstm block forwards the same after saving and oppening it again"
                 );
-
-
 
             lstmBlockT.printResult();
             mainT.assertTrue(lstmBlockT.result(), "LSTM block tests");

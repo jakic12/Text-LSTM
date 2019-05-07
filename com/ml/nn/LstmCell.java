@@ -35,8 +35,7 @@ public class LstmCell implements Serializable{
     public int[] mlpDimensionsH; // dimentions for the X network if gate mode is double
     
     public LstmCell(int inputSize, int outputSize, double learningRate) {
-        if(learningRate != 0)
-            this.learningRate = learningRate;
+        this.learningRate = learningRate;
         this.inSize = inputSize;
         this.outSize = outputSize;
 
@@ -101,6 +100,15 @@ public class LstmCell implements Serializable{
         this.mlpGates[1].randomlySetWeights();
         this.mlpGates[3].randomlySetWeights();
         this.mlpGates[2].randomlySetWeights();
+    }
+
+    public void setLearningRate(double learningRate){
+        this.learningRate = learningRate;
+
+        for (int i = 0; i < 4; i++) { // for all mlpGates
+            this.mlpGates[i].setSetting(8, this.learningRate);
+            this.doubleGates[i].setSetting(8, this.learningRate);
+        } 
     }
 
     /**
@@ -309,10 +317,10 @@ public class LstmCell implements Serializable{
         double error;
         x = x.clone();
         t = t.clone();
-        if (this.errorFunction == "meanSquared") {
+        if (this.errorFunction.equals("meanSquared")) {
             error = MathV.sum(MathV.div(MathV.pow(MathV.sub(x, t), 2), 2));
         } else {
-            throw new RuntimeException("unknown error function setting");
+            throw new RuntimeException("unknown error function setting \"" + this.errorFunction + "\"");
         }
 
         if(Double.isNaN(error)){

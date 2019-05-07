@@ -332,6 +332,14 @@ public class MathV{
         return -1;
     }
 
+    public static int indexOf(String[] x, String a){
+        for(int i = 0; i < x.length; i++){
+            if(x[i].equals(a))
+                return i;
+        }
+        return -1;
+    }
+
     /**
      * Sorts a char array
      * the method clones the object!
