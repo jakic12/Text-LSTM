@@ -110,8 +110,8 @@ public class LearningController implements Initializable {
         
         int epochs = 1000;
         int iterations = 10;
-        int graphEvery = 10;
-        int autosaveFrequency = 500;
+        int graphEvery = 100;
+        int autosaveFrequency = 50000;
         
         Thread learningThread = new Thread(new Runnable(){
             @Override

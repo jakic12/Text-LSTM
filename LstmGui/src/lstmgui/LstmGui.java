@@ -31,7 +31,7 @@ public class LstmGui extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
-        Parent root = FXMLLoader.load(getClass().getResource("switcher.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/lstmgui/views/register.fxml"));
         stage.initStyle(StageStyle.UNDECORATED);
         
         windowMovement(root, stage);
