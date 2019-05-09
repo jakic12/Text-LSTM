@@ -12,12 +12,14 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -25,6 +27,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javax.swing.JScrollPane;
 import lstmgui.model.stateManager;
+
+import lstmgui.model.UserManager.permission;
 
 /**
  * FXML Controller class
@@ -43,8 +47,20 @@ public class SwitcherController implements Initializable {
     private BorderPane borderpane;
     
     @FXML
+    private VBox tabsVbox;
+    
+    @FXML
+    private Label logUserName;
+    
+    @FXML
     private void closeButtonPressed(){
         System.exit(0);
+    }
+    
+    @FXML
+    private void logout(){
+        stateManager.loggedInUser = null;
+        stateManager.changeFile(getClass().getResource("/lstmgui/views/login.fxml"));
     }
     
     @FXML
@@ -73,6 +89,27 @@ public class SwitcherController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         setMainElement("dashboard");
         stateManager.switcher = this;
+        if(stateManager.loggedInUser == null){
+            logout();
+            return;
+        }
+        
+        logUserName.setText(stateManager.loggedInUser.username);
+        
+        //add account managment button if user is admin
+        if(stateManager.loggedInUser.userType == permission.ADMIN){
+            Button a = new Button("Accounts");
+            a.setPrefWidth(Integer.MAX_VALUE);
+            a.setMinHeight(50);
+            a.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    setMainElement("accounts");
+                }
+            });
+            a.setStyle("-fx-font:20px System;-fx-text-fill:#ffffff");
+            tabsVbox.getChildren().add(a);
+        }
     }   
     /** 
      * sets the center of the border pane to the view you want

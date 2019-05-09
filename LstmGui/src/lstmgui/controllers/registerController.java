@@ -7,8 +7,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import lstmgui.model.UserExistsException;
 import lstmgui.model.UserManager;
+import lstmgui.model.stateManager;
 
 public class registerController {
 
@@ -28,21 +31,45 @@ public class registerController {
 
     @FXML
     void loginButtonClicked(ActionEvent event) {
-        UserManager.printUsers();
+        stateManager.changeFile(getClass().getResource("/lstmgui/views/login.fxml"));
+    }
+    
+    @FXML
+    void keyPressedInForm(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER){
+            registerButtonClicked(null);
+        }
     }
 
     @FXML
     void registerButtonClicked(ActionEvent event) {
-        String username = usernameField.getText();
-        String pass = passwordField.getText();
-        if(pass.equals(passwordField1.getText())){
-            try {
-                UserManager.addUser(username, pass);
-            } catch (UserExistsException ex) {
-                displayError("user already exists!");
+        if(checkEmptyFields()){
+            String username = usernameField.getText();
+            String pass = passwordField.getText();
+            if(pass.equals(passwordField1.getText())){
+                try {
+                    UserManager.addUser(username, pass);
+                } catch (UserExistsException ex) {
+                    displayError("user already exists!");
+                }
+            }else{
+                displayError("passwords dont match");
             }
+        }
+    }
+    
+    boolean checkEmptyFields(){
+        if(usernameField.getText().isEmpty()){
+            stateManager.displayError("username field empty");
+            return false;
+        }else if(passwordField.getText().isEmpty()){
+            stateManager.displayError("password field empty");
+            return false;
+        }else if(passwordField1.getText().isEmpty()){
+            stateManager.displayError("you must repeat the password");
+            return false;
         }else{
-            displayError("passwords dont match");
+            return true;
         }
     }
     

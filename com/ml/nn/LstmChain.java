@@ -155,8 +155,6 @@ public class LstmChain implements Serializable{
             if (this.stopLearning)
                 break;
 
-            System.out.println(this.stopLearning);
-
             error += forward(testData, expData);
             backpropagate(testData, expData);
             

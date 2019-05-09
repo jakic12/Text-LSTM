@@ -13,10 +13,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lstmgui.model.User;
+
+import lstmgui.model.UserManager.permission;
 
 /**
  *
@@ -25,11 +30,16 @@ import java.util.logging.Logger;
 public class UserManager {
     public static String userFile = "users.u";
     
-    private static User[] getUsers(){
+    public static enum permission{
+        USER, // standard user
+        ADMIN // rights to manage users
+    }
+    
+    public static User[] getUsers(){
         File in = new File(userFile);
         User[] outUser = null;
         if(!in.exists())
-            return new User[0];
+            return new User[]{new User("admin", "admin", permission.ADMIN)};
         else{
             ObjectInputStream is = null;
             try {
@@ -75,18 +85,47 @@ public class UserManager {
     public static void addUser(String u, String p) throws UserExistsException{
         if(checkUser(u,p) == -1){
             ArrayList<User> users = new ArrayList<User>(Arrays.asList(getUsers()));
-            users.add(new User(u,p));
+            users.add(new User(u,p,permission.USER));
             System.out.println(users.size());
             saveUsers(users.toArray(new User[users.size()]));
         }else{
             throw new UserExistsException();
         }
     }
+    
+    public static User editUser(User user, String u, String p, permission per){
+        User[] users = getUsers();
+        for(int i = 0; i < users.length; i++){
+            if(users[i].equals(user)){
+                users[i].setUsername(u);
+                users[i].setPass(u);
+                users[i].setUserType(per);
+                
+                saveUsers(users);
+                return users[i];
+            }
+        }
+        return null;
+    }
+    
+    public static User editUser(User user, String u, permission per){
+        User[] users = getUsers();
+        for(int i = 0; i < users.length; i++){
+            if(users[i].equals(user)){
+                users[i].setUsername(u);
+                users[i].setUserType(per);
+                
+                saveUsers(users);
+                return users[i];
+            }
+        }
+        return null;
+    }
     /**
      * 
      * @param u
      * @param p
-     * @return returns -1 if user doesnt exist, 0 if password is wrong, 1 if password and username are correct
+     * @return returns -1 if user doesnt exist, -2 if password is wrong, the index of the user if password and username are correct
      */
     public static int checkUser(String u, String p){
         p = stateManager.getSHA(p);
@@ -94,9 +133,9 @@ public class UserManager {
         User[] users = getUsers();
         for(int i = 0; i < users.length; i++){
             if(users[i].username.equals(u)){
-                out = 0;
+                out = -2;
                 if(users[i].pass.equals(p)){
-                    out = 1;
+                    out = i;
                 }
             }
         }
@@ -110,17 +149,5 @@ public class UserManager {
             System.out.println(a.username);
             System.out.println(a.pass);
         }
-    }
-}
-
-class User implements Serializable{
-    String id;
-    public String username;
-    public String pass;
-    
-    public User(String u, String p){
-        this.username = u;
-        this.pass = stateManager.getSHA(p);
-        this.id = stateManager.getSHA(u+p);
     }
 }

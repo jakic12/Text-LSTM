@@ -25,3 +25,5 @@ hs_err_pid*
 **/.vscode/
 
 output\.json
+
+LstmGui/network_files/

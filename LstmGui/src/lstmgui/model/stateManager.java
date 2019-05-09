@@ -22,21 +22,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lstmgui.SwitcherController;
+import lstmgui.model.User;
 /**
  * this class was made to manage the static state
  * @author jakob
  */
 public class stateManager {
+    private static double xOffset;
+    private static double yOffset;
+    private static boolean dissableDrag;
     public static Stage stage;
     private static ArrayList<LstmBlock> blocks = new ArrayList<LstmBlock>();
     private static String networkFilesLocation = "network_files/";
     public static SwitcherController switcher = null;
+    
+    public static User loggedInUser;
     
     public static Thread learningThread = null;
 
@@ -60,9 +69,52 @@ public class stateManager {
             stage.setScene(scene);
             stage.show();
             
+            applyWindowMovement(root,stage);
+            
         } catch (IOException ex) {
             Logger.getLogger(stateManager.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Attaches mouse listener to move window if the tot bar is dragged
+     * 
+     * @param root the parent ( usually the root )
+     * @param stage the stage to move
+     */
+    private static void applyWindowMovement(Parent root, Stage stage){
+        root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+                if(event.getSceneY() > 30){
+                    dissableDrag = true;
+                }else{
+                    dissableDrag = false;
+                }
+            }
+        });
+        root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(!dissableDrag){
+                    stage.setX(event.getScreenX() - xOffset);
+                    stage.setY(event.getScreenY() - yOffset);
+                }
+            }
+        });
+    }
+    
+    public static void displayError(Exception e){
+        new Alert(Alert.AlertType.ERROR, e.getMessage()).showAndWait();
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+    }
+    
+    public static void displayError(String e){
+        new Alert(Alert.AlertType.ERROR, e).showAndWait();
+            System.out.println(e);
     }
     
     public static void addBlock(LstmBlock block){

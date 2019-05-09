@@ -75,7 +75,7 @@ public class DataController implements Initializable {
     }    
     
     private void refreshLstmBlocks(){
-        lstmList.getChildren().removeAll();
+        lstmList.getChildren().clear();
         LstmBlock[] existingBlocks = stateManager.getBlocks();
         
         for(int i = 0; i < existingBlocks.length; i++){

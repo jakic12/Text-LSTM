@@ -15,13 +15,23 @@
    <children>
       <AnchorPane layoutX="904.0" layoutY="12.0" prefHeight="805.0" prefWidth="280.0" styleClass="floating-box">
          <children>
-            <TextField fx:id="learningRateField" layoutX="96.0" layoutY="65.0" prefHeight="25.0" prefWidth="89.0" />
-            <Label layoutX="107.0" layoutY="43.0" text="learning rate" />
-            <TextField layoutX="77.0" layoutY="146.0" prefHeight="25.0" prefWidth="54.0" />
-            <Label layoutX="85.0" layoutY="125.0" text="learning rate decrease" />
-            <Label layoutX="141.0" layoutY="150.0" text="/" />
-            <TextField layoutX="155.0" layoutY="146.0" prefHeight="25.0" prefWidth="54.0" />
+            <TextField fx:id="learningRateField" layoutX="67.0" layoutY="65.0" prefHeight="25.0" prefWidth="149.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="65.0" />
+            <Label layoutX="106.0" layoutY="41.0" text="learning rate" />
+            <TextField layoutX="67.0" layoutY="130.0" prefHeight="25.0" prefWidth="54.0" AnchorPane.leftAnchor="65.0" />
+            <Label layoutX="83.0" layoutY="107.0" text="learning rate decrease" />
+            <Label layoutX="139.0" layoutY="134.0" text="/" />
+            <TextField layoutX="153.0" layoutY="130.0" prefHeight="25.0" prefWidth="54.0" AnchorPane.rightAnchor="65.0" />
             <Button layoutX="14.0" layoutY="766.0" mnemonicParsing="false" onAction="#changeSettings" prefHeight="25.0" prefWidth="89.0" text="set settings" />
+            <Label layoutX="120.0" layoutY="175.0" text="epochs" />
+            <Label layoutX="119.0" layoutY="236.0" text="iterations" />
+            <Label layoutX="113.0" layoutY="291.0" text="graph every" />
+            <Label layoutX="207.0" layoutY="320.0" text="epochs" />
+            <TextField fx:id="epochsField" layoutX="68.0" layoutY="198.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="65.0" />
+            <TextField fx:id="graphEveryField" layoutX="45.0" layoutY="316.0" />
+            <Label layoutX="100.0" layoutY="363.0" text="autosave every" />
+            <Label layoutX="207.0" layoutY="391.0" text="epochs" />
+            <TextField fx:id="autosaveEveryField" layoutX="45.0" layoutY="387.0" />
+            <TextField fx:id="iterationsField" layoutX="66.0" layoutY="253.0" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="65.0" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="14.0" layoutY="402.0" prefHeight="411.0" prefWidth="864.0" styleClass="floating-box">
@@ -58,7 +68,8 @@
                   </AnchorPane>
               </content>
             </ScrollPane>
-            <Button layoutX="133.0" layoutY="317.0" mnemonicParsing="false" onAction="#editLstms" prefHeight="33.0" prefWidth="135.0" style="-fx-background-color: #2693F2;" text="add / remove lstms" />
+            <Button layoutX="114.0" layoutY="317.0" mnemonicParsing="false" onAction="#editLstms" prefHeight="33.0" prefWidth="154.0" style="-fx-background-color: #2693F2;" text="add / remove lstms" />
+            <Button layoutX="14.0" layoutY="317.0" mnemonicParsing="false" onAction="#refreshLstmBlocksButton" prefHeight="33.0" prefWidth="95.0" text="refresh" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="223.0" prefWidth="561.0" styleClass="floating-box" />

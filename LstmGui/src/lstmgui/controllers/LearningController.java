@@ -63,9 +63,26 @@ public class LearningController implements Initializable {
     
     @FXML
     private TextField learningRateField;
+    
+    @FXML
+    private TextField epochsField;
+            
+    @FXML
+    private TextField iterationsField;
+    
+    @FXML
+    private TextField graphEveryField;
+    
+    @FXML
+    private TextField autosaveEveryField;
 
     @FXML
     private Button stopButton;
+    
+    @FXML
+    private void refreshLstmBlocksButton(){
+        refreshLstmBlocks();
+    }
 
     @FXML
     private void stopButtonAction(){
@@ -106,12 +123,13 @@ public class LearningController implements Initializable {
         }
         
         XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+        errorLineChart.getData().clear();
         errorLineChart.getData().add(series);
         
-        int epochs = 1000;
-        int iterations = 10;
-        int graphEvery = 100;
-        int autosaveFrequency = 50000;
+        int epochs = (epochsField.getText().isEmpty())? 1000 : Integer.parseInt(epochsField.getText());
+        int iterations = (iterationsField.getText().isEmpty())? 10 : Integer.parseInt(iterationsField.getText());
+        int graphEvery = (graphEveryField.getText().isEmpty())? 100 : Integer.parseInt(graphEveryField.getText());
+        int autosaveFrequency = (autosaveEveryField.getText().isEmpty())? 500 : Integer.parseInt(autosaveEveryField.getText());
         
         Thread learningThread = new Thread(new Runnable(){
             @Override
@@ -123,7 +141,6 @@ public class LearningController implements Initializable {
                         public void progress(int epoch, double error) {
                             //update progress bar and line chart
                             double progress = ((double)epoch/epochs)*100;
-                            System.out.println(progress);
                             trainingProgressBar.setProgress(progress/100);
                             
                             if(epoch % graphEvery == 0){
@@ -180,6 +197,12 @@ public class LearningController implements Initializable {
         lstmListScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         refreshLstmBlocks();
         refreshStopButtonVisibility();
+        
+        epochsField.setText("1000");
+        iterationsField.setText("10");
+        graphEveryField.setText("100");
+        autosaveEveryField.setText("500");
+        learningRateField.setText("0.0001");
     }   
     
     private void refreshLstmBlocks(){
