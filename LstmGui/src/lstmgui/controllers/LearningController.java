@@ -163,7 +163,8 @@ public class LearningController implements Initializable {
                         public void end(double error) {
                             refreshStopButtonVisibility(false);
                             System.out.println("finished!");
-                            System.out.println(selectedBlock.forward(selectedBlock.getStringData().charAt(0),100));
+                            System.out.println(selectedBlock.forwardWithVectorify(selectedBlock.getStringData().charAt(0),100));
+                            System.out.println(selectedBlock.forward(selectedBlock.getStringData().charAt(0) + "",100));
                             stateManager.saveBlock(selectedBlock);
                         }
                     });

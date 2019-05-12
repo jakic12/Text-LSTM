@@ -78,12 +78,12 @@ public class LstmBlock implements Serializable{
         try{
             this.chain.learn((double[][][]) this.trainingData, (double[][][]) this.expTrainingData, epochs, iterations);
         }catch(ClassCastException e){
-            System.out.println(e);
+            //System.out.println(e);
             try {
                 this.chain.learn(new double[][][]{(double[][]) trainingData}, new double[][][]{(double[][]) expTrainingData}, epochs, iterations);
             } catch (ClassCastException e1) {
-                System.out.println(e1);
-                e1.printStackTrace();
+                //System.out.println(e1);
+                //e1.printStackTrace();
             }
         }
         //System.out.println("training complete!");
@@ -102,7 +102,7 @@ public class LstmBlock implements Serializable{
             }
             
         } catch (ClassCastException e) {
-            System.out.println(e);
+            //System.out.println(e);
             try {
                 out = new String(DataManager.vectorToChar((double[][]) this.trainingData, this.vocabulary));
                 char[] expArr = DataManager.vectorToChar((double[][]) this.expTrainingData, this.vocabulary);
@@ -110,8 +110,8 @@ public class LstmBlock implements Serializable{
                 out += expArr[expArr.length-1];
 
             } catch (ClassCastException e1) {
-                System.out.println(e1);
-                e1.printStackTrace();
+                //System.out.println(e1);
+                //e1.printStackTrace();
             }
         } finally {
             return out;
@@ -131,6 +131,57 @@ public class LstmBlock implements Serializable{
             double[][] rawData = this.chain.forward(DataManager.vectorifyChar(this.vocabulary, startChar), count);
             char[] outData = DataManager.vectorToChar(rawData, vocabulary);
             return startChar + new String(outData);
+        }else{
+            throw new RuntimeException("can not forward a char if the network isnt a text network");
+        }
+    }
+
+    /**
+     * @see {@link #com.ml.nn.LstmChain.forwardWithVectorify(double[], int) }
+     * 
+     * @param startChar the first char(must be in vocabulary)
+     * @param count     how many times to forward
+     * @return a string of the sepparate characters
+     */
+    public String forwardWithVectorify(char startChar, int count) {
+        if (this.type.equals("text")) {
+            double[][] rawData = this.chain.forwardWithVectorify(DataManager.vectorifyChar(this.vocabulary, startChar), count);
+            char[] outData = DataManager.vectorToChar(rawData, vocabulary);
+            return startChar + new String(outData);
+        } else {
+            throw new RuntimeException("can not forward a char if the network isnt a text network");
+        }
+    }
+
+    /**
+     * @see {@link #com.ml.nn.LstmChain.forwardWithVectorify(double[], int) }
+     * 
+     * @param startChar the first char(must be in vocabulary)
+     * @param count     how many times to forward
+     * @return a string of the sepparate characters
+     */
+    public String forwardWithVectorify(String startChars, int count) {
+        if (this.type.equals("text")) {
+            double[][] rawData = this.chain.forwardWithVectorify(DataManager.vectorifyChar(this.vocabulary, startChars), count);
+            char[] outData = DataManager.vectorToChar(rawData, vocabulary);
+            return startChars + new String(outData);
+        } else {
+            throw new RuntimeException("can not forward a char if the network isnt a text network");
+        }
+    }
+
+    /**
+     * forward a string before generating the characters
+     * 
+     * @param startChars the string to forward at the start
+     * @param count how many times to forward
+     * @return the generated string
+     */
+    public String forward(String startChars, int count){
+        if(this.type.equals("text")){
+            double[][] rawData = this.chain.forward(DataManager.vectorifyChar(this.vocabulary, startChars), count);
+            char[] outData = DataManager.vectorToChar(rawData, vocabulary);
+            return startChars + new String(outData);
         }else{
             throw new RuntimeException("can not forward a char if the network isnt a text network");
         }

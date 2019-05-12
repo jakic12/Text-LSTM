@@ -32,11 +32,6 @@
                               <Font size="20.0" />
                            </font>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#switchMainPanel" prefHeight="44.0" prefWidth="256.0" text="Settings" textFill="WHITE">
-                           <font>
-                              <Font size="20.0" />
-                           </font>
-                        </Button>
                      </children>
                   </VBox>
                   <AnchorPane prefHeight="61.0" prefWidth="250.0" style="-fx-background-color: #2b2b2b;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0">

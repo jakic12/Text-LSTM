@@ -281,6 +281,38 @@ public class LstmChain implements Serializable{
     }
 
     /**
+     * forwards the starting data first and then forwards the output of t-1, n-1
+     * times
+     * 
+     * with an array of starting data
+     * 
+     * @param start the array of inputs to forward at the beginning
+     * @param count how many times to forward
+     * @return the array of all of the outputs trough time
+     * 
+     * @see {@link #forward(double[], int)}
+     */
+    public double[][] forward(double[][] start, int count){
+        double[][] out = new double[count][];
+        for(int i = 0; i < start.length; i++){
+            out[i] = start[i];
+            if(i == start.length-1)
+                out[i] = this.cell.eval(start[i]);
+            else if(i == 0)
+                this.cell.eval(start[i]);
+            else
+                this.cell.eval(start[i], this.cell.h, this.cell.c);
+        }
+
+        for(int i = 1; i < count; i++){
+            out[i] = this.cell.eval(this.cell.h, this.cell.h, this.cell.c);
+        }
+
+        return out;
+
+    }
+
+    /**
      * same as {@link #forward(double[], int)}, but cleans up output before feeding it forward<br>
      * <pre>
      * example:
@@ -297,6 +329,25 @@ public class LstmChain implements Serializable{
         for (int i = 1; i < count; i++) {
             out[i] = this.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(this.cell.h), this.cell.outSize), this.cell.h, this.cell.c);
         }
+        return out;
+    }
+
+    public double[][] forwardWithVectorify(double[][] start, int count) {
+        double[][] out = new double[count][];
+        for (int i = 0; i < start.length; i++) {
+            out[i] = start[i];
+            if (i == start.length - 1)
+                out[i] = this.cell.eval(start[i]);
+            else if (i == 0)
+                this.cell.eval(start[i]);
+            else
+                this.cell.eval(start[i], this.cell.h, this.cell.c);
+        }
+
+        for (int i = 1; i < count; i++) {
+            out[i] = this.cell.eval(MathV.vectorifyIndex(MathV.maxIndex(this.cell.h), this.cell.outSize), this.cell.h, this.cell.c);
+        }
+
         return out;
     }
 
