@@ -49,11 +49,13 @@ public class registerController {
             if(pass.equals(passwordField1.getText())){
                 try {
                     UserManager.addUser(username, pass);
+                    new Alert(Alert.AlertType.INFORMATION, "user created successfully").showAndWait();
+                    loginButtonClicked(null);
                 } catch (UserExistsException ex) {
-                    displayError("user already exists!");
+                    stateManager.displayError("user already exists!");
                 }
             }else{
-                displayError("passwords dont match");
+                stateManager.displayError("passwords dont match");
             }
         }
     }
@@ -71,11 +73,6 @@ public class registerController {
         }else{
             return true;
         }
-    }
-    
-    private void displayError(String e){
-        new Alert(Alert.AlertType.ERROR, e).showAndWait();
-            System.out.println(e);
     }
 
 }
