@@ -1,5 +1,8 @@
-# MLP -> MultiLayeredPerceptron
+# Running the gui
+run the file `LstmGui/dist/LstmGui.jar`
 
+# The library
+##### MLP -> MultiLayeredPerceptron
 ## Default settings object
 ```java
 double[] settings = {
