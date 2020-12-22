@@ -1,3 +1,7 @@
+# Math docs
+All of the math i did is written here
+[LSTM1.docx](LSTM1.docx)
+
 # Running the gui
 run the file `LstmGui/dist/LstmGui.jar`
 
